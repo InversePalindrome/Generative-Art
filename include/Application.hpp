@@ -8,8 +8,8 @@ InversePalindrome.com
 #pragma once
 
 #include "ParticleSystem.hpp"
-#include "ResourceManager.hpp"
 
+#include <cinder/Timer.h>
 #include <cinder/app/App.h>
 #include <cinder/app/RendererGl.h>
 
@@ -25,7 +25,8 @@ public:
 
 private:
 	ParticleSystem particleSystem;
-	ResourceManager resourceManager;
+
+	cinder::Timer timer;
 };
 
 CINDER_APP(Application, cinder::app::RendererGl, Application::initSettings)

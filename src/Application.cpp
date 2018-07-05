@@ -17,19 +17,25 @@ void Application::initSettings(cinder::app::App::Settings* settings)
 
 void Application::setup()
 {
-	resourceManager.loadResources("Resources.xml");
+	particleSystem.load("Particles.xml");
 
-	particleSystem.addParticles(50);
+
+	particleSystem.addParticles(25);
+
+	timer.start();
 }
 
 void Application::update() 
 {
-	particleSystem.update();
+	particleSystem.update(timer.getSeconds());
+
+	timer.start();
 }
 
 void Application::draw() 
 {
 	cinder::gl::clear();
+	cinder::gl::setMatricesWindow(cinder::app::getWindowSize());
 
 	particleSystem.draw();
 }
