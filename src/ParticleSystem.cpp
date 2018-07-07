@@ -6,6 +6,7 @@ InversePalindrome.com
 
 
 #include "ParticleSystem.hpp"
+#include "TextureManager.hpp"
 
 #include <cinder/Rand.h>
 #include <cinder/app/App.h>
@@ -14,8 +15,15 @@ InversePalindrome.com
 
 #include <pugixml.hpp>
 
+#include <limits>
+
 
 ParticleSystem::ParticleSystem(const std::string& filename) :
+	randomEngine(std::random_device()()),
+	emissionRate(1.f),
+	emissionDifference(0.f),
+	minLifeTime(std::numeric_limits<float>::infinity()),
+	maxLifeTime(std::numeric_limits<float>::infinity()),
 	sourcePosition(0.f, 0.f),
 	range(100.f, 100.f),
 	minScale(1.f, 1.f),
@@ -33,11 +41,23 @@ ParticleSystem::ParticleSystem(const std::string& filename) :
 void ParticleSystem::load(const std::string & filename)
 {
 	pugi::xml_document doc;
-
+	
 	if (doc.load_file(cinder::app::getAssetPath(filename).c_str()))
 	{
 		if (const auto particleSystemNode = doc.child("ParticleSystem"))
 		{
+			if (const auto emissionRateAttribute = particleSystemNode.attribute("emissionRate"))
+			{
+				emissionRate = emissionRateAttribute.as_float();
+			}
+			if (const auto minLifeTimeAttribute = particleSystemNode.attribute("minLifeTime"))
+			{
+				minLifeTime = minLifeTimeAttribute.as_float();
+			}
+			if (const auto maxLifeTimeAttribute = particleSystemNode.attribute("maxLifeTime"))
+			{
+				maxLifeTime = maxLifeTimeAttribute.as_float();
+			}
 			if (const auto sourcePositionXAttribute = particleSystemNode.attribute("xPosition"))
 			{
 				sourcePosition.x = sourcePositionXAttribute.as_float();
@@ -102,6 +122,20 @@ void ParticleSystem::load(const std::string & filename)
 			{
 				maxAngularVelocity = maxAngularVelocityAttribute.as_float();
 			}
+
+			for (const auto particleNode : particleSystemNode.children("Texture"))
+			{
+				textures.push_back(&TextureManager::getInstance()[Texture::_from_string(particleNode.text().as_string())]);
+
+				std::size_t textureWeight = 1u;
+
+				if (const auto textureWeightAttribute = particleNode.attribute("weight"))
+				{
+					textureWeight = textureWeightAttribute.as_uint();
+				}
+
+				textureWeights.push_back(textureWeight);
+			}
 		}
 	}
 }
@@ -112,7 +146,11 @@ void ParticleSystem::update(float deltaTime)
 	{
 		particle.setPosition(particle.getPosition() + deltaTime * particle.getLinearVelocity());
 		particle.setAngle(particle.getAngle() + deltaTime * particle.getAngularVelocity());
+		particle.setLifeTime(particle.getLifeTime() - deltaTime);
 	}
+
+	createParticles(deltaTime);
+	removeDeadParticles();
 }
 
 void ParticleSystem::draw()
@@ -120,13 +158,13 @@ void ParticleSystem::draw()
 	for (const auto& particle : particles)
 	{
 		cinder::gl::pushModelMatrix();
-		
+
 		cinder::gl::translate(particle.getPosition().x, particle.getPosition().y);
 		cinder::gl::scale(particle.getScale());
 		cinder::gl::rotate(particle.getAngle());
-		cinder::gl::color(particle.getColor());
-		cinder::gl::draw(*texture);
 
+		cinder::gl::draw(*textures[particle.getTextureIndex()]);
+			
 		cinder::gl::popModelMatrix();
 	}
 }
@@ -141,6 +179,10 @@ void ParticleSystem::addParticles(std::size_t particleCount)
 		particle.setAngle(cinder::randFloat(minAngle, maxAngle));
 		particle.setLinearVelocity({ cinder::randFloat(minLinearVelocity.x, maxLinearVelocity.x), cinder::randFloat(minLinearVelocity.y, maxLinearVelocity.y) });
 		particle.setAngularVelocity(cinder::randFloat(minAngularVelocity, maxAngularVelocity));
+		particle.setLifeTime(cinder::randFloat(minLifeTime, maxLifeTime));
+
+		std::discrete_distribution<> textureDistribution(std::cbegin(textureWeights), std::cend(textureWeights));
+		particle.setTextureIndex(textureDistribution(randomEngine));
 
 		particles.push_back(particle);
 	}
@@ -151,9 +193,34 @@ void ParticleSystem::clearParticles()
 	particles.clear();
 }
 
-void ParticleSystem::setTexture(const cinder::gl::Texture2dRef& texture)
+float ParticleSystem::getEmissionRate() const
 {
-	this->texture = &texture;
+	return emissionRate;
+}
+
+void ParticleSystem::setEmissionRate(float emissionRate)
+{
+	this->emissionRate = emissionRate;
+}
+
+float ParticleSystem::getMinLifeTime() const
+{
+	return minLifeTime;
+}
+
+void ParticleSystem::setMinLifeTime(float minLifeTime)
+{
+	this->minLifeTime = minLifeTime;
+}
+
+float ParticleSystem::getMaxLifeTime() const
+{
+	return maxLifeTime;
+}
+
+void ParticleSystem::setMaxLifeTime(float maxLifeTime)
+{
+	this->maxLifeTime = maxLifeTime;
 }
 
 cinder::vec2 ParticleSystem::getSourcePosition() const
@@ -254,4 +321,19 @@ float ParticleSystem::getMaxAngularVelocity() const
 void ParticleSystem::setMaxAngularVelocity(float maxAngularVelocity)
 {
 	this->maxAngularVelocity = maxAngularVelocity;
+}
+
+void ParticleSystem::createParticles(float deltaTime)
+{
+	auto particleAmount = emissionRate * deltaTime + emissionDifference;
+	auto numberOfParticles = static_cast<std::size_t>(particleAmount);
+
+	emissionDifference = particleAmount - numberOfParticles;
+
+	addParticles(numberOfParticles);
+}
+
+void ParticleSystem::removeDeadParticles()
+{
+	particles.erase(std::remove_if(std::begin(particles), std::end(particles), [](const auto& particle) { return particle.getLifeTime() <= 0.f; }), std::end(particles));
 }

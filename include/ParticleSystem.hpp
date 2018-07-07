@@ -13,6 +13,7 @@ InversePalindrome.com
 
 #include <string>
 #include <vector>
+#include <random>
 
 
 class ParticleSystem
@@ -28,7 +29,14 @@ public:
 	void addParticles(std::size_t particleCount);
 	void clearParticles();
 
-	void setTexture(const cinder::gl::Texture2dRef& texture);
+	float getEmissionRate() const;
+	void setEmissionRate(float emissionRate);
+
+	float getMinLifeTime() const;
+	void setMinLifeTime(float minLifeTime);
+
+	float getMaxLifeTime() const;
+	void setMaxLifeTime(float maxLifeTime);
 
 	cinder::vec2 getSourcePosition() const;
 	void setSourcePosition(const cinder::vec2& sourcePosition);
@@ -63,7 +71,15 @@ public:
 private:
 	std::vector<Particle> particles;
 
-	const cinder::gl::Texture2dRef* texture;
+	std::vector<cinder::gl::Texture2dRef*> textures;
+	std::vector<std::size_t> textureWeights;
+	std::mt19937 randomEngine;
+
+	float emissionRate;
+	float emissionDifference;
+
+	float minLifeTime;
+	float maxLifeTime;
 
 	cinder::vec2 sourcePosition;
 	cinder::vec2 range;
@@ -79,4 +95,7 @@ private:
 
 	float minAngularVelocity;
 	float maxAngularVelocity;
+
+	void createParticles(float deltaTime);
+	void removeDeadParticles();
 };

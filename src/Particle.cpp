@@ -7,6 +7,8 @@ InversePalindrome.com
 
 #include "Particle.hpp"
 
+#include <limits>
+
 
 Particle::Particle() :
 	position(0.f, 0.f),
@@ -14,7 +16,8 @@ Particle::Particle() :
 	angle(0.f),
 	linearVelocity(0.f, 0.f),
 	angularVelocity(0.f),
-	color(cinder::Colorf::white())
+	lifeTime(std::numeric_limits<float>::infinity()),
+	textureIndex(0)
 {
 }
 
@@ -68,22 +71,22 @@ void Particle::setAngularVelocity(float angularVelocity)
 	this->angularVelocity = angularVelocity;
 }
 
-cinder::Colorf Particle::getColor() const
-{
-	return color;
-}
-
-void Particle::setColor(const cinder::Colorf& color)
-{
-	this->color = color;
-}
-
-std::chrono::milliseconds Particle::getLifeTime() const
+float Particle::getLifeTime() const
 {
 	return lifeTime;
 }
 
-void Particle::setLifeTime(const std::chrono::milliseconds& lifeTime)
+void Particle::setLifeTime(float lifeTime)
 {
 	this->lifeTime = lifeTime;
+}
+
+std::size_t Particle::getTextureIndex() const
+{
+	return textureIndex;
+}
+
+void Particle::setTextureIndex(std::size_t textureIndex)
+{
+	this->textureIndex = textureIndex;
 }

@@ -6,6 +6,7 @@ InversePalindrome.com
 
 
 #include "Application.hpp"
+#include "TextureManager.hpp"
 
 #include <cinder/gl/wrapper.h>
 
@@ -17,10 +18,8 @@ void Application::initSettings(cinder::app::App::Settings* settings)
 
 void Application::setup()
 {
+	TextureManager::getInstance().load("Textures.xml");
 	particleSystem.load("Particles.xml");
-
-
-	particleSystem.addParticles(25);
 
 	timer.start();
 }
