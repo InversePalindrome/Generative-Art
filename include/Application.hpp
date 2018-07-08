@@ -7,9 +7,9 @@ InversePalindrome.com
 
 #pragma once
 
+#include "SceneManager.hpp"
 #include "ParticleSystem.hpp"
 
-#include <cinder/Timer.h>
 #include <cinder/app/App.h>
 #include <cinder/app/RendererGl.h>
 
@@ -24,9 +24,7 @@ public:
 	virtual void draw() override;
 
 private:
-	ParticleSystem particleSystem;
-
-	cinder::Timer timer;
+	SceneManager sceneManager;
 };
 
 CINDER_APP(Application, cinder::app::RendererGl, Application::initSettings)

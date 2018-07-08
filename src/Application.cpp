@@ -18,23 +18,20 @@ void Application::initSettings(cinder::app::App::Settings* settings)
 
 void Application::setup()
 {
-	TextureManager::getInstance().load("Textures.xml");
-	particleSystem.load("Particles.xml");
+	sceneManager.pushScene<ArtCreatorScene>();
 
-	timer.start();
+	TextureManager::getInstance().load("Textures.xml");
 }
 
 void Application::update() 
 {
-	particleSystem.update(timer.getSeconds());
-
-	timer.start();
+	sceneManager.update();
 }
 
 void Application::draw() 
 {
 	cinder::gl::clear();
 	cinder::gl::setMatricesWindow(cinder::app::getWindowSize());
-
-	particleSystem.draw();
+	
+	sceneManager.draw();
 }

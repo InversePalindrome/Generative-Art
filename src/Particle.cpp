@@ -11,14 +11,24 @@ InversePalindrome.com
 
 
 Particle::Particle() :
+	lifeTime(std::numeric_limits<float>::infinity()),
 	position(0.f, 0.f),
 	scale(1.f, 1.f),
 	angle(0.f),
 	linearVelocity(0.f, 0.f),
 	angularVelocity(0.f),
-	lifeTime(std::numeric_limits<float>::infinity()),
 	textureIndex(0)
 {
+}
+
+float Particle::getLifeTime() const
+{
+	return lifeTime;
+}
+
+void Particle::setLifeTime(float lifeTime)
+{
+	this->lifeTime = lifeTime;
 }
 
 cinder::vec2 Particle::getPosition() const
@@ -69,16 +79,6 @@ float Particle::getAngularVelocity() const
 void Particle::setAngularVelocity(float angularVelocity)
 {
 	this->angularVelocity = angularVelocity;
-}
-
-float Particle::getLifeTime() const
-{
-	return lifeTime;
-}
-
-void Particle::setLifeTime(float lifeTime)
-{
-	this->lifeTime = lifeTime;
 }
 
 std::size_t Particle::getTextureIndex() const
