@@ -10,15 +10,27 @@ InversePalindrome.com
 
 void SceneManager::update()
 {
-	scenes.top()->update();
+	for (const auto& sceneTransition : sceneTransitions)
+	{
+		sceneTransition();
+	}
+
+    sceneTransitions.clear();
+
+	scenes.back()->update();
 }
 
 void SceneManager::draw()
 {
-	scenes.top()->draw();
+	scenes.back()->draw();
 }
 
 void SceneManager::popScene()
 {
-	scenes.pop();
+	sceneTransitions.push_back([this]() 
+	{
+		scenes.back()->onExit();
+
+		scenes.pop_back(); 
+	});
 }

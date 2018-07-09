@@ -8,10 +8,10 @@ InversePalindrome.com
 #pragma once
 
 #include "Scene.hpp"
-#include "ArtCreatorScene.hpp"
 
-#include <stack>
+#include <vector>
 #include <memory>
+#include <functional>
 
 
 class SceneManager
@@ -20,17 +20,23 @@ public:
 	void update();
 	void draw();
 
-	template<typename T>
-	void pushScene();
+	template<typename T, typename... Ts>
+	void pushScene(Ts... params);
 
 	void popScene();
 
 private:
-	std::stack<std::unique_ptr<Scene>> scenes;
+	std::vector<std::unique_ptr<Scene>> scenes;
+	std::vector<std::function<void()>> sceneTransitions;
 };
 
-template<typename T>
-void SceneManager::pushScene()
+template<typename T, typename ...Ts>
+void SceneManager::pushScene(Ts... params)
 {
-	scenes.push(std::make_unique<T>(*this));
+	sceneTransitions.push_back([this, params...]() 
+	{
+		scenes.push_back(std::make_unique<T>(*this, params...));
+
+		scenes.back()->onEnter();
+	});
 }

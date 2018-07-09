@@ -19,7 +19,8 @@ InversePalindrome.com
 class ParticleSystem
 {
 public:
-	explicit ParticleSystem(const std::string& filename="");
+	ParticleSystem();
+	explicit ParticleSystem(const std::string& filename);
 
 	void load(const std::string & filename);
 
@@ -32,41 +33,41 @@ public:
 	float getEmissionRate() const;
 	void setEmissionRate(float emissionRate);
 
-	float getMinLifeTime() const;
-	void setMinLifeTime(float minLifeTime);
+	float getLifeTime() const;
+	void setLifeTime(float lifeTime);
 
-	float getMaxLifeTime() const;
-	void setMaxLifeTime(float maxLifeTime);
+	float getLifeTimeVariance() const;
+	void setLifeTimeVariance(float lifeTimeVariance);
 
-	cinder::vec2 getSourcePosition() const;
-	void setSourcePosition(const cinder::vec2& sourcePosition);
+	cinder::vec2 getPosition() const;
+	void setPosition(const cinder::vec2& position);
 
-	cinder::vec2 getRange() const;
-	void setRange(const cinder::vec2& range);
+	cinder::vec2 getPositionVariance() const;
+	void setPositionVariance(const cinder::vec2& positionVariance);
 
-	cinder::vec2 getMinScale() const;
-	void setMinScale(const cinder::vec2& minScale);
+	cinder::vec2 getScale() const;
+	void setScale(const cinder::vec2& scale);
 
-	cinder::vec2 getMaxScale() const;
-	void setMaxScale(const cinder::vec2& maxScale);
+	cinder::vec2 getScaleVariance() const;
+	void setScaleVariance(const cinder::vec2& scaleVariance);
 
-	float getMinAngle() const;
-	void setMinAngle(float minAngle);
+	float getAngle() const;
+	void setAngle(float angle);
 
-	float getMaxAngle() const;
-	void setMaxAngle(float maxAngle);
+	float getAngleVariance() const;
+	void setAngleVariance(float angleVariance);
 
-	cinder::vec2 getMinLinearVelocity() const;
-	void setMinLinearVelocity(const cinder::vec2& minLinearVelocity);
+	cinder::vec2 getLinearVelocity() const;
+	void setLinearVelocity(const cinder::vec2& linearVelocity);
 
-	cinder::vec2 getMaxLinearVelocity() const;
-	void setMaxLinearVelocity(const cinder::vec2& maxLinearVelocity);
+	cinder::vec2 getLinearVelocityVariance() const;
+	void setLinearVelocityVariance(const cinder::vec2& linearVelocityVariance);
 
-	float getMinAngularVelocity() const;
-	void setMinAngularVelocity(float minAngularVelocity);
+	float getAngularVelocity() const;
+	void setAngularVelocity(float angularVelocity);
 
-	float getMaxAngularVelocity() const;
-	void setMaxAngularVelocity(float maxAngularVelocity);
+	float getAngularVelocityVariance() const;
+	void setAngularVelocityVariance(float angularVelocityVariance);
 
 private:
 	std::vector<Particle> particles;
@@ -78,23 +79,23 @@ private:
 	float emissionRate;
 	float emissionDifference;
 
-	float minLifeTime;
-	float maxLifeTime;
+	float lifeTime;
+	float lifeTimeVariance;
 
-	cinder::vec2 sourcePosition;
-	cinder::vec2 range;
+	cinder::vec2 position;
+	cinder::vec2 positionVariance;
 
-	cinder::vec2 minScale;
-	cinder::vec2 maxScale;
+	cinder::vec2 scale;
+	cinder::vec2 scaleVariance;
 
-	float minAngle;
-	float maxAngle;
+	float angle;
+	float angleVariance;
 
-	cinder::vec2 minLinearVelocity;
-	cinder::vec2 maxLinearVelocity;
+	cinder::vec2 linearVelocity;
+	cinder::vec2 linearVelocityVariance;
 
-	float minAngularVelocity;
-	float maxAngularVelocity;
+	float angularVelocity;
+	float angularVelocityVariance;
 
 	void createParticles(float deltaTime);
 	void removeDeadParticles();

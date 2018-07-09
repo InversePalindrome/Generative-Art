@@ -18,22 +18,27 @@ InversePalindrome.com
 #include <limits>
 
 
-ParticleSystem::ParticleSystem(const std::string& filename) :
+ParticleSystem::ParticleSystem() :
 	randomEngine(std::random_device()()),
 	emissionRate(1.f),
 	emissionDifference(0.f),
-	minLifeTime(std::numeric_limits<float>::infinity()),
-	maxLifeTime(std::numeric_limits<float>::infinity()),
-	sourcePosition(0.f, 0.f),
-	range(100.f, 100.f),
-	minScale(1.f, 1.f),
-	maxScale(1.f, 1.f),
-	minAngle(0.f),
-	maxAngle(1.f),
-	minLinearVelocity(0.f, 0.f),
-	maxLinearVelocity(0.f, 0.f),
-	minAngularVelocity(0.f),
-	maxAngularVelocity(0.f)
+	lifeTime(100.f),
+	lifeTimeVariance(0.f),
+	position(0.f, 0.f),
+	positionVariance(0.f, 0.f),
+	scale(1.f, 1.f),
+	scaleVariance(0.f, 0.f),
+	angle(0.f),
+	angleVariance(0.f),
+	linearVelocity(0.f, 0.f),
+	linearVelocityVariance(0.f, 0.f),
+	angularVelocity(0.f),
+	angularVelocityVariance(0.f)
+{
+}
+
+ParticleSystem::ParticleSystem(const std::string& filename) :
+	ParticleSystem()
 {
 	load(filename);
 }
@@ -50,77 +55,77 @@ void ParticleSystem::load(const std::string & filename)
 			{
 				emissionRate = emissionRateAttribute.as_float();
 			}
-			if (const auto minLifeTimeAttribute = particleSystemNode.attribute("minLifeTime"))
+			if (const auto lifeTimeAttribute = particleSystemNode.attribute("lifeTime"))
 			{
-				minLifeTime = minLifeTimeAttribute.as_float();
+				lifeTime = lifeTimeAttribute.as_float();
 			}
-			if (const auto maxLifeTimeAttribute = particleSystemNode.attribute("maxLifeTime"))
+			if (const auto lifeTimeVarianceAttribute = particleSystemNode.attribute("lifeTimeVariance"))
 			{
-				maxLifeTime = maxLifeTimeAttribute.as_float();
+			    lifeTimeVariance = lifeTimeVarianceAttribute.as_float();
 			}
-			if (const auto sourcePositionXAttribute = particleSystemNode.attribute("xPosition"))
+			if (const auto xPositionAttribute = particleSystemNode.attribute("xPosition"))
 			{
-				sourcePosition.x = sourcePositionXAttribute.as_float();
+				position.x = xPositionAttribute.as_float();
 			}
-			if (const auto sourcePositionYAttribute = particleSystemNode.attribute("yPosition"))
+			if (const auto yPositionAttribute = particleSystemNode.attribute("yPosition"))
 			{
-				sourcePosition.y = sourcePositionYAttribute.as_float();
+			    position.y = yPositionAttribute.as_float();
 			}
-			if (const auto rangeWidthAttribute = particleSystemNode.attribute("rangeWidth"))
+			if (const auto xPositionVarianceAttribute = particleSystemNode.attribute("xPositionVariance"))
 			{
-				range.x = rangeWidthAttribute.as_float();
+				positionVariance.x = xPositionVarianceAttribute.as_float();
 			}
-			if (const auto rangeHeightAttribute = particleSystemNode.attribute("rangeHeight"))
+			if (const auto yPositionVarianceAttribute = particleSystemNode.attribute("yPositionVariance"))
 			{
-				range.y = rangeHeightAttribute.as_float();
+				positionVariance.y = yPositionVarianceAttribute.as_float();
 			}
-			if (const auto minScaleWidthAttribute = particleSystemNode.attribute("minScaleWidth"))
+			if (const auto widthScaleAttribute = particleSystemNode.attribute("widthScale"))
 			{
-				minScale.x = minScaleWidthAttribute.as_float();
+				scale.x = widthScaleAttribute.as_float();
 			}
-			if (const auto minScaleHeightAttribute = particleSystemNode.attribute("minScaleHeight"))
+			if (const auto heightScaleAttribute = particleSystemNode.attribute("heightScale"))
 			{
-				minScale.y = minScaleHeightAttribute.as_float();
+				scale.y = heightScaleAttribute.as_float();
 			}
-			if (const auto maxScaleWidthAttribute = particleSystemNode.attribute("maxScaleWidth"))
+			if (const auto widthScaleVarianceAttribute = particleSystemNode.attribute("widthScaleVariance"))
 			{
-				maxScale.x = maxScaleWidthAttribute.as_float();
+				scaleVariance.x = widthScaleVarianceAttribute.as_float();
 			}
-			if (const auto maxScaleHeightAttribute = particleSystemNode.attribute("maxScaleHeight"))
+			if (const auto heightScaleVarianceAttribute = particleSystemNode.attribute("heightScaleVariance"))
 			{
-				maxScale.y = maxScaleHeightAttribute.as_float();
+				scaleVariance.y = heightScaleVarianceAttribute.as_float();
 			}
-			if (const auto minAngleAttribute = particleSystemNode.attribute("minAngle"))
+			if (const auto angleAttribute = particleSystemNode.attribute("angle"))
 			{
-				minAngle = minAngleAttribute.as_float();;
+				angle = angleAttribute.as_float();;
 			}
-			if (const auto maxAngleAttribute = particleSystemNode.attribute("maxAngle"))
+			if (const auto angleVarianceAttribute = particleSystemNode.attribute("angleVariance"))
 			{
-				maxAngle = maxAngleAttribute.as_float();
+				angleVariance = angleVarianceAttribute.as_float();
 			}
-			if (const auto minLinearVelocityXAttribute = particleSystemNode.attribute("minLinearVelocityX"))
+			if (const auto xLinearVelocityAttribute = particleSystemNode.attribute("XlinearVelocity"))
 			{
-				minLinearVelocity.x = minLinearVelocityXAttribute.as_float();
+			    linearVelocity.x = xLinearVelocityAttribute.as_float();
 			}
-			if (const auto minLinearVelocityYAttribute = particleSystemNode.attribute("minLinearVelocityY"))
+			if (const auto yLinearVelocityAttribute = particleSystemNode.attribute("yLinearVelocity"))
 			{
-				minLinearVelocity.y = minLinearVelocityYAttribute.as_float();
+			    linearVelocity.y = yLinearVelocityAttribute.as_float();
 			}
-			if (const auto maxLinearVelocityXAttribute = particleSystemNode.attribute("maxLinearVelocityX"))
+			if (const auto xLinearVelocityVarianceAttribute = particleSystemNode.attribute("xLinearVelocityVariance"))
 			{
-				maxLinearVelocity.x = maxLinearVelocityXAttribute.as_float();
+				linearVelocityVariance.x = xLinearVelocityVarianceAttribute.as_float();
 			}
-			if (const auto maxLinearVelocityYAttribute = particleSystemNode.attribute("maxLinearVelocityY"))
+			if (const auto yLinearVelocityVarianceAttribute = particleSystemNode.attribute("yLinearVelocityVariance"))
 			{
-				maxLinearVelocity.y = maxLinearVelocityYAttribute.as_float();
+				linearVelocityVariance.y = yLinearVelocityVarianceAttribute.as_float();
 			}
-			if (const auto minAngularVelocityAttribute = particleSystemNode.attribute("minAngularVelocity"))
+			if (const auto angularVelocityAttribute = particleSystemNode.attribute("angularVelocity"))
 			{
-				minAngularVelocity = minAngularVelocityAttribute.as_float();
+				angularVelocity = angularVelocityAttribute.as_float();
 			}
-			if (const auto maxAngularVelocityAttribute = particleSystemNode.attribute("maxAngularVelocity"))
+			if (const auto angularVelocityVarianceAttribute = particleSystemNode.attribute("angularVelocityVariance"))
 			{
-				maxAngularVelocity = maxAngularVelocityAttribute.as_float();
+				angularVelocityVariance = angularVelocityVarianceAttribute.as_float();
 			}
 
 			for (const auto particleNode : particleSystemNode.children("Texture"))
@@ -174,12 +179,12 @@ void ParticleSystem::addParticles(std::size_t particleCount)
 	for (std::size_t i = 0u; i < particleCount; ++i)
 	{
 		Particle particle;
-		particle.setPosition({ sourcePosition.x + cinder::randFloat(range.x), sourcePosition.y + cinder::randFloat(range.y) });
-		particle.setScale({ cinder::randFloat(minScale.x, maxScale.x), cinder::randFloat(minScale.y, maxScale.y) });
-		particle.setAngle(cinder::randFloat(minAngle, maxAngle));
-		particle.setLinearVelocity({ cinder::randFloat(minLinearVelocity.x, maxLinearVelocity.x), cinder::randFloat(minLinearVelocity.y, maxLinearVelocity.y) });
-		particle.setAngularVelocity(cinder::randFloat(minAngularVelocity, maxAngularVelocity));
-		particle.setLifeTime(cinder::randFloat(minLifeTime, maxLifeTime));
+		particle.setPosition({ position.x + positionVariance.x * cinder::randFloat(-1.f, 1.f), position.y + positionVariance.y * cinder::randFloat(-1.f, 1.f) });
+		particle.setScale({ scale.x + scaleVariance.x * cinder::randFloat(-1.f, 1.f), scale.y  + scaleVariance.y * cinder::randFloat(-1.f, 1.f)});
+		particle.setAngle(angle + angleVariance * cinder::randFloat(-1.f, 1.f));
+		particle.setLinearVelocity({ linearVelocity.x + linearVelocityVariance.x * cinder::randFloat(-1.f, 1.f), linearVelocity.y + linearVelocityVariance.y * cinder::randFloat(-1.f, 1.f) });
+		particle.setAngularVelocity(angularVelocity + angularVelocityVariance * cinder::randFloat(-1.f, 1.f));
+		particle.setLifeTime(lifeTime + lifeTimeVariance * cinder::randFloat(-1.f, 1.f));
 
 		std::discrete_distribution<> textureDistribution(std::cbegin(textureWeights), std::cend(textureWeights));
 		particle.setTextureIndex(textureDistribution(randomEngine));
@@ -203,124 +208,124 @@ void ParticleSystem::setEmissionRate(float emissionRate)
 	this->emissionRate = emissionRate;
 }
 
-float ParticleSystem::getMinLifeTime() const
+float ParticleSystem::getLifeTime() const
 {
-	return minLifeTime;
+	return lifeTime;
 }
 
-void ParticleSystem::setMinLifeTime(float minLifeTime)
+void ParticleSystem::setLifeTime(float lifeTime)
 {
-	this->minLifeTime = minLifeTime;
+	this->lifeTime = lifeTime;
 }
 
-float ParticleSystem::getMaxLifeTime() const
+float ParticleSystem::getLifeTimeVariance() const
 {
-	return maxLifeTime;
+	return lifeTime;
 }
 
-void ParticleSystem::setMaxLifeTime(float maxLifeTime)
+void ParticleSystem::setLifeTimeVariance(float lifeTime)
 {
-	this->maxLifeTime = maxLifeTime;
+	this->lifeTime = lifeTime;
 }
 
-cinder::vec2 ParticleSystem::getSourcePosition() const
+cinder::vec2 ParticleSystem::getPosition() const
 {
-	return sourcePosition;
+	return position;
 }
 
-void ParticleSystem::setSourcePosition(const cinder::vec2& sourcePosition)
+void ParticleSystem::setPosition(const cinder::vec2& pPosition)
 {
-	this->sourcePosition = sourcePosition;
+	this->position = position;
 }
 
-cinder::vec2 ParticleSystem::getRange() const
+cinder::vec2 ParticleSystem::getPositionVariance() const
 {
-	return range;
+	return positionVariance;
 }
 
-void ParticleSystem::setRange(const cinder::vec2& range)
+void ParticleSystem::setPositionVariance(const cinder::vec2& positionVariance)
 {
-	this->range = range;
+	this->positionVariance = positionVariance;
 }
 
-cinder::vec2 ParticleSystem::getMinScale() const
+cinder::vec2 ParticleSystem::getScale() const
 {
-	return minScale;
+	return scale;
 }
 
-void ParticleSystem::setMinScale(const cinder::vec2& minScale)
+void ParticleSystem::setScale(const cinder::vec2& scale)
 {
-	this->minScale = minScale;
+	this->scale = scale;
 }
 
-cinder::vec2 ParticleSystem::getMaxScale() const
+cinder::vec2 ParticleSystem::getScaleVariance() const
 {
-	return maxScale;
+	return scaleVariance;
 }
 
-void ParticleSystem::setMaxScale(const cinder::vec2& maxScale)
+void ParticleSystem::setScaleVariance(const cinder::vec2& scaleVariance)
 {
-	this->maxScale = maxScale;
+	this->scaleVariance = scaleVariance;
 }
 
-float ParticleSystem::getMinAngle() const
+float ParticleSystem::getAngle() const
 {
-	return minAngle;
+	return angle;
 }
 
-void ParticleSystem::setMinAngle(float minAngle)
+void ParticleSystem::setAngle(float angle)
 {
-	this->minAngle = minAngle;
+	this->angle = angle;
 }
 
-float ParticleSystem::getMaxAngle() const
+float ParticleSystem::getAngleVariance() const
 {
-	return maxAngle;
+	return angleVariance;
 }
 
-void ParticleSystem::setMaxAngle(float maxAngle)
+void ParticleSystem::setAngleVariance(float angleVariance)
 {
-	this->maxAngle = maxAngle;
+	this->angleVariance = angleVariance;
 }
 
-cinder::vec2 ParticleSystem::getMinLinearVelocity() const
+cinder::vec2 ParticleSystem::getLinearVelocity() const
 {
-	return minLinearVelocity;
+	return linearVelocity;
 }
 
-void ParticleSystem::setMinLinearVelocity(const cinder::vec2& minLinearVelocity)
+void ParticleSystem::setLinearVelocity(const cinder::vec2& linearVelocity)
 {
-	this->minLinearVelocity = minLinearVelocity;
+	this->linearVelocity = linearVelocity;
 }
 
-cinder::vec2 ParticleSystem::getMaxLinearVelocity() const
+cinder::vec2 ParticleSystem::getLinearVelocityVariance() const
 {
-	return maxLinearVelocity;
+	return linearVelocityVariance;
 }
 
-void ParticleSystem::setMaxLinearVelocity(const cinder::vec2& maxLinearVelocity)
+void ParticleSystem::setLinearVelocityVariance(const cinder::vec2& linearVelocityVariance)
 {
-	this->maxLinearVelocity = maxLinearVelocity;
+	this->linearVelocityVariance = linearVelocityVariance;
 }
 
-float ParticleSystem::getMinAngularVelocity() const
+float ParticleSystem::getAngularVelocity() const
 {
-	return minAngularVelocity;
+	return angularVelocity;
 }
 
-void ParticleSystem::setMinAngularVelocity(float minAngularVelocity)
+void ParticleSystem::setAngularVelocity(float angularVelocity)
 {
-	this->minAngularVelocity = minAngularVelocity;
+	this->angularVelocity = angularVelocity;
 }
 
-float ParticleSystem::getMaxAngularVelocity() const
+float ParticleSystem::getAngularVelocityVariance() const
 {
-	return maxAngularVelocity;
+	return angularVelocityVariance;
 }
 
-void ParticleSystem::setMaxAngularVelocity(float maxAngularVelocity)
+void ParticleSystem::setAngularVelocityVariance(float angularVelocityVariance)
 {
-	this->maxAngularVelocity = maxAngularVelocity;
+	this->angularVelocityVariance = angularVelocityVariance;
 }
 
 void ParticleSystem::createParticles(float deltaTime)

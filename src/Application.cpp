@@ -6,6 +6,7 @@ InversePalindrome.com
 
 
 #include "Application.hpp"
+#include "SplashScene.hpp"
 #include "TextureManager.hpp"
 
 #include <cinder/gl/wrapper.h>
@@ -18,7 +19,7 @@ void Application::initSettings(cinder::app::App::Settings* settings)
 
 void Application::setup()
 {
-	sceneManager.pushScene<ArtCreatorScene>();
+	sceneManager.pushScene<SplashScene>();
 
 	TextureManager::getInstance().load("Textures.xml");
 }
