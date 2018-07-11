@@ -7,6 +7,7 @@ InversePalindrome.com
 
 #pragma once
 
+#include <cinder/Color.h>
 #include <cinder/Vector.h>
 
 
@@ -15,8 +16,11 @@ class Particle
 public:
 	Particle();
 
-	float getLifeTime() const;
-	void setLifeTime(float lifeTime);
+	float getTotalLifeTime() const;
+	void setTotalLifeTime(float totalLifeTime);
+
+	float getCurrentLifeTime() const;
+	void setCurrentLifeTime(float currentLifeTime);
 
 	cinder::vec2 getPosition() const;
 	void setPosition(const cinder::vec2& position);
@@ -33,11 +37,15 @@ public:
 	float getAngularVelocity() const;
 	void setAngularVelocity(float angularVelocity);
 
-	std::size_t getTextureIndex() const;
-	void setTextureIndex(std::size_t textureIndex);
+	cinder::ColorA getColor() const;
+	void setColor(const cinder::ColorA& color);
+
+	cinder::ColorA getEndColor() const;
+	void setEndColor(const cinder::ColorA& endColor);
 
 private:
-	float lifeTime;
+	float totalLifeTime;
+	float currentLifeTime;
 
 	cinder::vec2 position;
 	cinder::vec2 scale;
@@ -46,5 +54,6 @@ private:
 	cinder::vec2 linearVelocity;
 	float angularVelocity;
 
-	std::size_t textureIndex;
+	cinder::ColorA color;
+	cinder::ColorA endColor;
 };

@@ -33,10 +33,5 @@ private:
 template<typename T, typename ...Ts>
 void SceneManager::pushScene(Ts... params)
 {
-	sceneTransitions.push_back([this, params...]() 
-	{
-		scenes.push_back(std::make_unique<T>(*this, params...));
-
-		scenes.back()->onEnter();
-	});
+	sceneTransitions.push_back([this, params...]() {scenes.push_back(std::make_unique<T>(*this, params...)); });
 }

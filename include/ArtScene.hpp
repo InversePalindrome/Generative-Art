@@ -12,6 +12,9 @@ InversePalindrome.com
 
 #include <pretzel/PretzelGui.h>
 
+#include <cinder/Timer.h>
+#include <cinder/app/App.h>
+
 
 class ArtScene : public Scene
 {
@@ -22,13 +25,19 @@ public:
 	virtual void draw() override;
 
 private:
+	cinder::Timer timer;
+	cinder::app::WindowRef controlWindow;
+
+	pretzel::PretzelGuiRef mainGui;
+	pretzel::PretzelGuiRef controlGui;
+
 	ParticleSystem particleSystem;
 
-	pretzel::PretzelGuiRef gui;
+	std::string particlesToAdd;
 
-	float emissionRate;
+	std::string emissionRate;
 
-	std::string lifeTime;
+	std::string totalLifeTime;
 	std::string lifeTimeVariance;
 
 	std::string xPosition;
@@ -54,4 +63,18 @@ private:
 	
 	std::string angularVelocity;
 	std::string angularVelocityVariance;
+
+	cinder::ColorA startColor;
+	cinder::ColorA startColorVariance;
+
+	cinder::ColorA endColor;
+	cinder::ColorA endColorVariance;
+
+	void load();
+	void save();
+
+	void addParticles();
+	void clearParticles();
+
+	void setTexture();
 };

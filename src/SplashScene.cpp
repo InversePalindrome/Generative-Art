@@ -31,5 +31,5 @@ void SplashScene::update()
 void SplashScene::draw()
 {
 	cinder::gl::clear(cinder::ColorA::white());
-	cinder::gl::draw(splashScreen);
+	cinder::gl::draw(splashScreen, {(cinder::app::getWindowWidth() - splashScreen->getWidth()) / 2.f, (cinder::app::getWindowHeight() - splashScreen->getHeight()) / 2.f});
 }

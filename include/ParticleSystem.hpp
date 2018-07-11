@@ -13,16 +13,12 @@ InversePalindrome.com
 
 #include <string>
 #include <vector>
-#include <random>
 
 
 class ParticleSystem
 {
 public:
 	ParticleSystem();
-	explicit ParticleSystem(const std::string& filename);
-
-	void load(const std::string & filename);
 
 	void update(float deltaTime);
 	void draw();
@@ -30,11 +26,13 @@ public:
 	void addParticles(std::size_t particleCount);
 	void clearParticles();
 
+	void setTexture(const std::experimental::filesystem::path& filename);
+
 	float getEmissionRate() const;
 	void setEmissionRate(float emissionRate);
 
-	float getLifeTime() const;
-	void setLifeTime(float lifeTime);
+	float getTotalLifeTime() const;
+	void setTotalLifeTime(float totalLifeTime);
 
 	float getLifeTimeVariance() const;
 	void setLifeTimeVariance(float lifeTimeVariance);
@@ -69,17 +67,27 @@ public:
 	float getAngularVelocityVariance() const;
 	void setAngularVelocityVariance(float angularVelocityVariance);
 
+	cinder::ColorA getStartColor() const;
+	void setStartColor(const cinder::ColorA& startColor);
+
+	cinder::ColorA getStartColorVariance() const;
+	void setStartColorVariance(const cinder::ColorA& startColorVariance);
+
+	cinder::ColorA getEndColor() const;
+	void setEndColor(const cinder::ColorA& endColor);
+
+	cinder::ColorA getEndColorVariance() const;
+	void setEndColorVariance(const cinder::ColorA& endColorVariance);
+
 private:
 	std::vector<Particle> particles;
 
-	std::vector<cinder::gl::Texture2dRef*> textures;
-	std::vector<std::size_t> textureWeights;
-	std::mt19937 randomEngine;
+	cinder::gl::Texture2dRef texture;
 
 	float emissionRate;
 	float emissionDifference;
 
-	float lifeTime;
+	float totalLifeTime;
 	float lifeTimeVariance;
 
 	cinder::vec2 position;
@@ -96,6 +104,12 @@ private:
 
 	float angularVelocity;
 	float angularVelocityVariance;
+
+	cinder::ColorA startColor;
+	cinder::ColorA startColorVariance;
+
+	cinder::ColorA endColor;
+	cinder::ColorA endColorVariance;
 
 	void createParticles(float deltaTime);
 	void removeDeadParticles();

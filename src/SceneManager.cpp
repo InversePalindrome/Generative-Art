@@ -14,7 +14,7 @@ void SceneManager::update()
 	{
 		sceneTransition();
 	}
-
+	
     sceneTransitions.clear();
 
 	scenes.back()->update();
@@ -27,10 +27,5 @@ void SceneManager::draw()
 
 void SceneManager::popScene()
 {
-	sceneTransitions.push_back([this]() 
-	{
-		scenes.back()->onExit();
-
-		scenes.pop_back(); 
-	});
+	sceneTransitions.push_back([this]() { scenes.pop_back(); });
 }

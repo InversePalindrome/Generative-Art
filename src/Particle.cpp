@@ -7,28 +7,38 @@ InversePalindrome.com
 
 #include "Particle.hpp"
 
-#include <limits>
-
 
 Particle::Particle() :
-	lifeTime(std::numeric_limits<float>::infinity()),
+	totalLifeTime(100.f),
+	currentLifeTime(0.f),
 	position(0.f, 0.f),
 	scale(1.f, 1.f),
 	angle(0.f),
 	linearVelocity(0.f, 0.f),
 	angularVelocity(0.f),
-	textureIndex(0)
+	color(cinder::ColorA::white()),
+	endColor(cinder::ColorA::white())
 {
 }
 
-float Particle::getLifeTime() const
+float Particle::getTotalLifeTime() const
 {
-	return lifeTime;
+	return totalLifeTime;
 }
 
-void Particle::setLifeTime(float lifeTime)
+void Particle::setTotalLifeTime(float totalLifeTime)
 {
-	this->lifeTime = lifeTime;
+	this->totalLifeTime = totalLifeTime;
+}
+
+float Particle::getCurrentLifeTime() const
+{
+	return currentLifeTime;
+}
+
+void Particle::setCurrentLifeTime(float currentLifeTime)
+{
+	this->currentLifeTime = currentLifeTime;
 }
 
 cinder::vec2 Particle::getPosition() const
@@ -81,12 +91,22 @@ void Particle::setAngularVelocity(float angularVelocity)
 	this->angularVelocity = angularVelocity;
 }
 
-std::size_t Particle::getTextureIndex() const
+cinder::ColorA Particle::getColor() const
 {
-	return textureIndex;
+	return color;
 }
 
-void Particle::setTextureIndex(std::size_t textureIndex)
+void Particle::setColor(const cinder::ColorA& color)
 {
-	this->textureIndex = textureIndex;
+	this->color = color;
+}
+
+cinder::ColorA Particle::getEndColor() const
+{
+	return endColor;
+}
+
+void Particle::setEndColor(const cinder::ColorA& endColor)
+{
+	this->endColor = endColor;
 }

@@ -6,26 +6,20 @@ InversePalindrome.com
 
 
 #include "ParticleSystem.hpp"
-#include "TextureManager.hpp"
 
 #include <cinder/Rand.h>
 #include <cinder/app/App.h>
 #include <cinder/gl/draw.h>
 #include <cinder/gl/wrapper.h>
 
-#include <pugixml.hpp>
-
-#include <limits>
-
 
 ParticleSystem::ParticleSystem() :
-	randomEngine(std::random_device()()),
 	emissionRate(1.f),
 	emissionDifference(0.f),
-	lifeTime(100.f),
+	totalLifeTime(100.f),
 	lifeTimeVariance(0.f),
 	position(0.f, 0.f),
-	positionVariance(0.f, 0.f),
+	positionVariance(100.f, 100.f),
 	scale(1.f, 1.f),
 	scaleVariance(0.f, 0.f),
 	angle(0.f),
@@ -33,127 +27,24 @@ ParticleSystem::ParticleSystem() :
 	linearVelocity(0.f, 0.f),
 	linearVelocityVariance(0.f, 0.f),
 	angularVelocity(0.f),
-	angularVelocityVariance(0.f)
+	angularVelocityVariance(0.f),
+	startColor(cinder::ColorA::white()),
+	startColorVariance(cinder::ColorA::white()),
+	endColor(cinder::ColorA::white()),
+	endColorVariance(cinder::ColorA::white())
 {
-}
-
-ParticleSystem::ParticleSystem(const std::string& filename) :
-	ParticleSystem()
-{
-	load(filename);
-}
-
-void ParticleSystem::load(const std::string & filename)
-{
-	pugi::xml_document doc;
-	
-	if (doc.load_file(cinder::app::getAssetPath(filename).c_str()))
-	{
-		if (const auto particleSystemNode = doc.child("ParticleSystem"))
-		{
-			if (const auto emissionRateAttribute = particleSystemNode.attribute("emissionRate"))
-			{
-				emissionRate = emissionRateAttribute.as_float();
-			}
-			if (const auto lifeTimeAttribute = particleSystemNode.attribute("lifeTime"))
-			{
-				lifeTime = lifeTimeAttribute.as_float();
-			}
-			if (const auto lifeTimeVarianceAttribute = particleSystemNode.attribute("lifeTimeVariance"))
-			{
-			    lifeTimeVariance = lifeTimeVarianceAttribute.as_float();
-			}
-			if (const auto xPositionAttribute = particleSystemNode.attribute("xPosition"))
-			{
-				position.x = xPositionAttribute.as_float();
-			}
-			if (const auto yPositionAttribute = particleSystemNode.attribute("yPosition"))
-			{
-			    position.y = yPositionAttribute.as_float();
-			}
-			if (const auto xPositionVarianceAttribute = particleSystemNode.attribute("xPositionVariance"))
-			{
-				positionVariance.x = xPositionVarianceAttribute.as_float();
-			}
-			if (const auto yPositionVarianceAttribute = particleSystemNode.attribute("yPositionVariance"))
-			{
-				positionVariance.y = yPositionVarianceAttribute.as_float();
-			}
-			if (const auto widthScaleAttribute = particleSystemNode.attribute("widthScale"))
-			{
-				scale.x = widthScaleAttribute.as_float();
-			}
-			if (const auto heightScaleAttribute = particleSystemNode.attribute("heightScale"))
-			{
-				scale.y = heightScaleAttribute.as_float();
-			}
-			if (const auto widthScaleVarianceAttribute = particleSystemNode.attribute("widthScaleVariance"))
-			{
-				scaleVariance.x = widthScaleVarianceAttribute.as_float();
-			}
-			if (const auto heightScaleVarianceAttribute = particleSystemNode.attribute("heightScaleVariance"))
-			{
-				scaleVariance.y = heightScaleVarianceAttribute.as_float();
-			}
-			if (const auto angleAttribute = particleSystemNode.attribute("angle"))
-			{
-				angle = angleAttribute.as_float();;
-			}
-			if (const auto angleVarianceAttribute = particleSystemNode.attribute("angleVariance"))
-			{
-				angleVariance = angleVarianceAttribute.as_float();
-			}
-			if (const auto xLinearVelocityAttribute = particleSystemNode.attribute("XlinearVelocity"))
-			{
-			    linearVelocity.x = xLinearVelocityAttribute.as_float();
-			}
-			if (const auto yLinearVelocityAttribute = particleSystemNode.attribute("yLinearVelocity"))
-			{
-			    linearVelocity.y = yLinearVelocityAttribute.as_float();
-			}
-			if (const auto xLinearVelocityVarianceAttribute = particleSystemNode.attribute("xLinearVelocityVariance"))
-			{
-				linearVelocityVariance.x = xLinearVelocityVarianceAttribute.as_float();
-			}
-			if (const auto yLinearVelocityVarianceAttribute = particleSystemNode.attribute("yLinearVelocityVariance"))
-			{
-				linearVelocityVariance.y = yLinearVelocityVarianceAttribute.as_float();
-			}
-			if (const auto angularVelocityAttribute = particleSystemNode.attribute("angularVelocity"))
-			{
-				angularVelocity = angularVelocityAttribute.as_float();
-			}
-			if (const auto angularVelocityVarianceAttribute = particleSystemNode.attribute("angularVelocityVariance"))
-			{
-				angularVelocityVariance = angularVelocityVarianceAttribute.as_float();
-			}
-
-			for (const auto particleNode : particleSystemNode.children("Texture"))
-			{
-				textures.push_back(&TextureManager::getInstance()[Texture::_from_string(particleNode.text().as_string())]);
-
-				std::size_t textureWeight = 1u;
-
-				if (const auto textureWeightAttribute = particleNode.attribute("weight"))
-				{
-					textureWeight = textureWeightAttribute.as_uint();
-				}
-
-				textureWeights.push_back(textureWeight);
-			}
-		}
-	}
 }
 
 void ParticleSystem::update(float deltaTime)
 {
 	for (auto& particle : particles)
 	{
+		particle.setCurrentLifeTime(particle.getCurrentLifeTime() + deltaTime);
 		particle.setPosition(particle.getPosition() + deltaTime * particle.getLinearVelocity());
 		particle.setAngle(particle.getAngle() + deltaTime * particle.getAngularVelocity());
-		particle.setLifeTime(particle.getLifeTime() - deltaTime);
+		particle.setColor((particle.getEndColor() - particle.getColor()) * (1 / particle.getTotalLifeTime()) + particle.getColor());
 	}
-
+	
 	createParticles(deltaTime);
 	removeDeadParticles();
 }
@@ -167,9 +58,10 @@ void ParticleSystem::draw()
 		cinder::gl::translate(particle.getPosition().x, particle.getPosition().y);
 		cinder::gl::scale(particle.getScale());
 		cinder::gl::rotate(particle.getAngle());
+		cinder::gl::color(particle.getColor());
 
-		cinder::gl::draw(*textures[particle.getTextureIndex()]);
-			
+		cinder::gl::draw(texture);
+		
 		cinder::gl::popModelMatrix();
 	}
 }
@@ -179,15 +71,14 @@ void ParticleSystem::addParticles(std::size_t particleCount)
 	for (std::size_t i = 0u; i < particleCount; ++i)
 	{
 		Particle particle;
+		particle.setTotalLifeTime(totalLifeTime + lifeTimeVariance * cinder::randFloat(-1.f, 1.f));
 		particle.setPosition({ position.x + positionVariance.x * cinder::randFloat(-1.f, 1.f), position.y + positionVariance.y * cinder::randFloat(-1.f, 1.f) });
 		particle.setScale({ scale.x + scaleVariance.x * cinder::randFloat(-1.f, 1.f), scale.y  + scaleVariance.y * cinder::randFloat(-1.f, 1.f)});
 		particle.setAngle(angle + angleVariance * cinder::randFloat(-1.f, 1.f));
 		particle.setLinearVelocity({ linearVelocity.x + linearVelocityVariance.x * cinder::randFloat(-1.f, 1.f), linearVelocity.y + linearVelocityVariance.y * cinder::randFloat(-1.f, 1.f) });
 		particle.setAngularVelocity(angularVelocity + angularVelocityVariance * cinder::randFloat(-1.f, 1.f));
-		particle.setLifeTime(lifeTime + lifeTimeVariance * cinder::randFloat(-1.f, 1.f));
-
-		std::discrete_distribution<> textureDistribution(std::cbegin(textureWeights), std::cend(textureWeights));
-		particle.setTextureIndex(textureDistribution(randomEngine));
+		particle.setColor(startColor + startColorVariance * cinder::randFloat(-1.f, 1.f));
+		particle.setEndColor(endColor + endColorVariance * cinder::randFloat(-1.f, 1.f));
 
 		particles.push_back(particle);
 	}
@@ -196,6 +87,11 @@ void ParticleSystem::addParticles(std::size_t particleCount)
 void ParticleSystem::clearParticles()
 {
 	particles.clear();
+}
+
+void ParticleSystem::setTexture(const std::experimental::filesystem::path& filename)
+{
+	texture = cinder::gl::Texture2d::create(cinder::loadImage(filename));
 }
 
 float ParticleSystem::getEmissionRate() const
@@ -208,24 +104,24 @@ void ParticleSystem::setEmissionRate(float emissionRate)
 	this->emissionRate = emissionRate;
 }
 
-float ParticleSystem::getLifeTime() const
+float ParticleSystem::getTotalLifeTime() const
 {
-	return lifeTime;
+	return totalLifeTime;
 }
 
-void ParticleSystem::setLifeTime(float lifeTime)
+void ParticleSystem::setTotalLifeTime(float totalLifeTime)
 {
-	this->lifeTime = lifeTime;
+	this->totalLifeTime = totalLifeTime;
 }
 
 float ParticleSystem::getLifeTimeVariance() const
 {
-	return lifeTime;
+	return lifeTimeVariance;
 }
 
-void ParticleSystem::setLifeTimeVariance(float lifeTime)
+void ParticleSystem::setLifeTimeVariance(float lifeTimeVariance)
 {
-	this->lifeTime = lifeTime;
+	this->lifeTimeVariance = lifeTimeVariance;
 }
 
 cinder::vec2 ParticleSystem::getPosition() const
@@ -328,6 +224,46 @@ void ParticleSystem::setAngularVelocityVariance(float angularVelocityVariance)
 	this->angularVelocityVariance = angularVelocityVariance;
 }
 
+cinder::ColorA ParticleSystem::getStartColor() const
+{
+	return startColor;
+}
+
+void ParticleSystem::setStartColor(const cinder::ColorA& startColor)
+{
+	this->startColor = startColor;
+}
+
+cinder::ColorA ParticleSystem::getStartColorVariance() const
+{
+	return startColorVariance;
+}
+
+void ParticleSystem::setStartColorVariance(const cinder::ColorA& startColorVariance)
+{
+	this->startColorVariance = startColorVariance;
+}
+
+cinder::ColorA ParticleSystem::getEndColor() const
+{
+	return endColor;
+}
+
+void ParticleSystem::setEndColor(const cinder::ColorA& endColor)
+{
+	this->endColor = endColor;
+}
+
+cinder::ColorA ParticleSystem::getEndColorVariance() const
+{
+	return endColorVariance;
+}
+
+void ParticleSystem::setEndColorVariance(const cinder::ColorA& endColorVariance)
+{
+	this->endColorVariance = endColorVariance;
+}
+
 void ParticleSystem::createParticles(float deltaTime)
 {
 	auto particleAmount = emissionRate * deltaTime + emissionDifference;
@@ -340,5 +276,5 @@ void ParticleSystem::createParticles(float deltaTime)
 
 void ParticleSystem::removeDeadParticles()
 {
-	particles.erase(std::remove_if(std::begin(particles), std::end(particles), [](const auto& particle) { return particle.getLifeTime() <= 0.f; }), std::end(particles));
+	particles.erase(std::remove_if(std::begin(particles), std::end(particles), [](const auto& particle) { return particle.getCurrentLifeTime() >= particle.getTotalLifeTime(); }), std::end(particles));
 }

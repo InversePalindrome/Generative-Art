@@ -13,11 +13,3 @@ Scene::Scene(SceneManager& sceneManager) :
 	sceneManager(sceneManager)
 {
 }
-
-void Scene::onEnter()
-{
-}
-
-void Scene::onExit()
-{
-}

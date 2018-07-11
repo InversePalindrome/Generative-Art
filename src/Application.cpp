@@ -19,9 +19,9 @@ void Application::initSettings(cinder::app::App::Settings* settings)
 
 void Application::setup()
 {
-	sceneManager.pushScene<SplashScene>();
-
 	TextureManager::getInstance().load("Textures.xml");
+
+	sceneManager.pushScene<SplashScene>();
 }
 
 void Application::update() 

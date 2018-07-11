@@ -16,7 +16,7 @@ float Conversions::stringToFloat(const std::string& string, float optional)
 	{
 		value = std::stof(string);
 	}
-	catch (const std::invalid_argument&)
+	catch (const std::exception&)
 	{
 		return optional;
 	}
