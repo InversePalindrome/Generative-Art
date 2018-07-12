@@ -11,12 +11,13 @@ InversePalindrome.com
 
 #include <cinder/gl/Texture.h>
 
-#include <string>
 #include <vector>
 
 
 class ParticleSystem
 {
+	friend class ArtScene;
+
 public:
 	ParticleSystem();
 
@@ -26,7 +27,7 @@ public:
 	void addParticles(std::size_t particleCount);
 	void clearParticles();
 
-	void setTexture(const std::experimental::filesystem::path& filename);
+	void setTexture(cinder::gl::Texture2dRef texture);
 
 	float getEmissionRate() const;
 	void setEmissionRate(float emissionRate);

@@ -10,6 +10,10 @@ InversePalindrome.com
 #include "SceneManager.hpp"
 #include "TextureManager.hpp"
 
+#include <cinder/app/App.h>
+#include <cinder/gl/draw.h>
+#include <cinder/gl/wrapper.h>
+
 
 SplashScene::SplashScene(SceneManager& sceneManager) :
 	Scene(sceneManager),

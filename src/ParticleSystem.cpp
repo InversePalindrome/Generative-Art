@@ -14,12 +14,12 @@ InversePalindrome.com
 
 
 ParticleSystem::ParticleSystem() :
-	emissionRate(1.f),
+	emissionRate(5.f),
 	emissionDifference(0.f),
 	totalLifeTime(100.f),
 	lifeTimeVariance(0.f),
 	position(0.f, 0.f),
-	positionVariance(100.f, 100.f),
+	positionVariance(250.f, 250.f),
 	scale(1.f, 1.f),
 	scaleVariance(0.f, 0.f),
 	angle(0.f),
@@ -89,9 +89,9 @@ void ParticleSystem::clearParticles()
 	particles.clear();
 }
 
-void ParticleSystem::setTexture(const std::experimental::filesystem::path& filename)
+void ParticleSystem::setTexture(cinder::gl::Texture2dRef texture)
 {
-	texture = cinder::gl::Texture2d::create(cinder::loadImage(filename));
+	this->texture = texture;
 }
 
 float ParticleSystem::getEmissionRate() const

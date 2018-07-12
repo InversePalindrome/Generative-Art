@@ -10,6 +10,8 @@ InversePalindrome.com
 #include "SceneManager.hpp"
 #include "ParticleSystem.hpp"
 
+#include <CinderImGui.h>
+
 #include <cinder/app/App.h>
 #include <cinder/app/RendererGl.h>
 
