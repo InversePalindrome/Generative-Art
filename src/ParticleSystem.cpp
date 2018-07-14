@@ -6,46 +6,93 @@ InversePalindrome.com
 
 
 #include "ParticleSystem.hpp"
+#include "DefaultEmitter.hpp"
+#include "LifeTimeAffector.hpp"
+#include "ColorGradientAffector.hpp"
+#include "LinearVelocityAffector.hpp"
+#include "AngularVelocityAffector.hpp"
 
-#include <cinder/Rand.h>
 #include <cinder/app/App.h>
 #include <cinder/gl/draw.h>
 #include <cinder/gl/wrapper.h>
 
+#include <pugixml.hpp>
 
-ParticleSystem::ParticleSystem() :
-	emissionRate(5.f),
-	emissionDifference(0.f),
-	totalLifeTime(100.f),
-	lifeTimeVariance(0.f),
-	position(0.f, 0.f),
-	positionVariance(250.f, 250.f),
-	scale(1.f, 1.f),
-	scaleVariance(0.f, 0.f),
-	angle(0.f),
-	angleVariance(0.f),
-	linearVelocity(0.f, 0.f),
-	linearVelocityVariance(0.f, 0.f),
-	angularVelocity(0.f),
-	angularVelocityVariance(0.f),
-	startColor(cinder::ColorA::white()),
-	startColorVariance(cinder::ColorA::white()),
-	endColor(cinder::ColorA::white()),
-	endColorVariance(cinder::ColorA::white())
+
+void ParticleSystem::load(const std::string& filename)
 {
+	pugi::xml_document doc;
+
+	if (doc.load(filename.c_str()))
+	{
+		if (const auto particleSystemNode = doc.child("ParticleSystem"))
+		{
+			for (const auto emitterNode : particleSystemNode.children("Emitter"))
+			{
+				if (const auto emitterTypeAttribute = emitterNode.attribute("type"))
+				{
+					if (std::strcmp(emitterTypeAttribute.as_string(), "default"))
+					{
+						DefaultEmitter defaultEmitter;
+						defaultEmitter.load(emitterNode);
+
+						emitters.push_back(std::make_unique<DefaultEmitter>());
+					}
+				}
+			}
+			for (const auto affectorNode : particleSystemNode.children("Affector"))
+			{
+				if (const auto affectorTypeAttribute = affectorNode.attribute("type"))
+				{
+					if (std::strcmp(affectorTypeAttribute.as_string(), "lifeTime"))
+					{
+						affectors.push_back(std::make_unique<LifeTimeAffector>());
+					}
+					else if (std::strcmp(affectorTypeAttribute.as_string(), "linearVelocity"))
+					{
+						affectors.push_back(std::make_unique<LinearVelocityAffector>());
+					}
+					else if (std::strcmp(affectorTypeAttribute.as_string(), "angularVelocity"))
+					{
+						affectors.push_back(std::make_unique<AngularVelocityAffector>());
+					}
+					else if (std::strcmp(affectorTypeAttribute.as_string(), "colorGradient"))
+					{
+						affectors.push_back(std::make_unique<ColorGradientAffector>());
+					}
+				}
+			}
+		}
+	}
+}
+
+void ParticleSystem::save(const std::string& filename)
+{
+	pugi::xml_document doc;
+
+	auto declaration = doc.append_child(pugi::node_declaration);
+	declaration.append_attribute("version") = "1.0";
+	declaration.append_attribute("encoding") = "UTF-8";
+
+	auto particleSystemNode = doc.append_child("ParticleSystem");
+
+	for (const auto& emitter : emitters)
+	{
+		emitter->save(particleSystemNode.append_child("Emitter"));
+	}
+	for (const auto& affector : affectors)
+	{
+
+	}
+
+	doc.save_file(filename.c_str());
 }
 
 void ParticleSystem::update(float deltaTime)
 {
-	for (auto& particle : particles)
-	{
-		particle.setCurrentLifeTime(particle.getCurrentLifeTime() + deltaTime);
-		particle.setPosition(particle.getPosition() + deltaTime * particle.getLinearVelocity());
-		particle.setAngle(particle.getAngle() + deltaTime * particle.getAngularVelocity());
-		particle.setColor((particle.getEndColor() - particle.getColor()) * (1 / particle.getTotalLifeTime()) + particle.getColor());
-	}
-	
-	createParticles(deltaTime);
+	updateAffectors(deltaTime);
+	updateEmitters(deltaTime);
+
 	removeDeadParticles();
 }
 
@@ -66,27 +113,29 @@ void ParticleSystem::draw()
 	}
 }
 
-void ParticleSystem::addParticles(std::size_t particleCount)
+void ParticleSystem::emitParticle(const Particle& particle)
 {
-	for (std::size_t i = 0u; i < particleCount; ++i)
-	{
-		Particle particle;
-		particle.setTotalLifeTime(totalLifeTime + lifeTimeVariance * cinder::randFloat(-1.f, 1.f));
-		particle.setPosition({ position.x + positionVariance.x * cinder::randFloat(-1.f, 1.f), position.y + positionVariance.y * cinder::randFloat(-1.f, 1.f) });
-		particle.setScale({ scale.x + scaleVariance.x * cinder::randFloat(-1.f, 1.f), scale.y  + scaleVariance.y * cinder::randFloat(-1.f, 1.f)});
-		particle.setAngle(angle + angleVariance * cinder::randFloat(-1.f, 1.f));
-		particle.setLinearVelocity({ linearVelocity.x + linearVelocityVariance.x * cinder::randFloat(-1.f, 1.f), linearVelocity.y + linearVelocityVariance.y * cinder::randFloat(-1.f, 1.f) });
-		particle.setAngularVelocity(angularVelocity + angularVelocityVariance * cinder::randFloat(-1.f, 1.f));
-		particle.setColor(startColor + startColorVariance * cinder::randFloat(-1.f, 1.f));
-		particle.setEndColor(endColor + endColorVariance * cinder::randFloat(-1.f, 1.f));
-
-		particles.push_back(particle);
-	}
+	particles.push_back(particle);
 }
 
-void ParticleSystem::clearParticles()
+void ParticleSystem::addAffector(std::unique_ptr<Affector> affector)
 {
-	particles.clear();
+	affectors.push_back(std::move(affector));
+}
+
+void ParticleSystem::clearAffectors()
+{
+	affectors.clear();
+}
+
+void ParticleSystem::addEmitter(std::unique_ptr<Emitter> emitter)
+{
+	emitters.push_back(std::move(emitter));
+}
+
+void ParticleSystem::clearEmitters()
+{
+	emitters.clear();
 }
 
 void ParticleSystem::setTexture(cinder::gl::Texture2dRef texture)
@@ -94,184 +143,23 @@ void ParticleSystem::setTexture(cinder::gl::Texture2dRef texture)
 	this->texture = texture;
 }
 
-float ParticleSystem::getEmissionRate() const
+void ParticleSystem::updateAffectors(float deltaTime)
 {
-	return emissionRate;
+	for (auto& particle : particles)
+	{
+		for (auto& affector : affectors)
+		{
+			affector->update(particle, deltaTime);
+		}
+	}
 }
 
-void ParticleSystem::setEmissionRate(float emissionRate)
+void ParticleSystem::updateEmitters(float deltaTime)
 {
-	this->emissionRate = emissionRate;
-}
-
-float ParticleSystem::getTotalLifeTime() const
-{
-	return totalLifeTime;
-}
-
-void ParticleSystem::setTotalLifeTime(float totalLifeTime)
-{
-	this->totalLifeTime = totalLifeTime;
-}
-
-float ParticleSystem::getLifeTimeVariance() const
-{
-	return lifeTimeVariance;
-}
-
-void ParticleSystem::setLifeTimeVariance(float lifeTimeVariance)
-{
-	this->lifeTimeVariance = lifeTimeVariance;
-}
-
-cinder::vec2 ParticleSystem::getPosition() const
-{
-	return position;
-}
-
-void ParticleSystem::setPosition(const cinder::vec2& pPosition)
-{
-	this->position = position;
-}
-
-cinder::vec2 ParticleSystem::getPositionVariance() const
-{
-	return positionVariance;
-}
-
-void ParticleSystem::setPositionVariance(const cinder::vec2& positionVariance)
-{
-	this->positionVariance = positionVariance;
-}
-
-cinder::vec2 ParticleSystem::getScale() const
-{
-	return scale;
-}
-
-void ParticleSystem::setScale(const cinder::vec2& scale)
-{
-	this->scale = scale;
-}
-
-cinder::vec2 ParticleSystem::getScaleVariance() const
-{
-	return scaleVariance;
-}
-
-void ParticleSystem::setScaleVariance(const cinder::vec2& scaleVariance)
-{
-	this->scaleVariance = scaleVariance;
-}
-
-float ParticleSystem::getAngle() const
-{
-	return angle;
-}
-
-void ParticleSystem::setAngle(float angle)
-{
-	this->angle = angle;
-}
-
-float ParticleSystem::getAngleVariance() const
-{
-	return angleVariance;
-}
-
-void ParticleSystem::setAngleVariance(float angleVariance)
-{
-	this->angleVariance = angleVariance;
-}
-
-cinder::vec2 ParticleSystem::getLinearVelocity() const
-{
-	return linearVelocity;
-}
-
-void ParticleSystem::setLinearVelocity(const cinder::vec2& linearVelocity)
-{
-	this->linearVelocity = linearVelocity;
-}
-
-cinder::vec2 ParticleSystem::getLinearVelocityVariance() const
-{
-	return linearVelocityVariance;
-}
-
-void ParticleSystem::setLinearVelocityVariance(const cinder::vec2& linearVelocityVariance)
-{
-	this->linearVelocityVariance = linearVelocityVariance;
-}
-
-float ParticleSystem::getAngularVelocity() const
-{
-	return angularVelocity;
-}
-
-void ParticleSystem::setAngularVelocity(float angularVelocity)
-{
-	this->angularVelocity = angularVelocity;
-}
-
-float ParticleSystem::getAngularVelocityVariance() const
-{
-	return angularVelocityVariance;
-}
-
-void ParticleSystem::setAngularVelocityVariance(float angularVelocityVariance)
-{
-	this->angularVelocityVariance = angularVelocityVariance;
-}
-
-cinder::ColorA ParticleSystem::getStartColor() const
-{
-	return startColor;
-}
-
-void ParticleSystem::setStartColor(const cinder::ColorA& startColor)
-{
-	this->startColor = startColor;
-}
-
-cinder::ColorA ParticleSystem::getStartColorVariance() const
-{
-	return startColorVariance;
-}
-
-void ParticleSystem::setStartColorVariance(const cinder::ColorA& startColorVariance)
-{
-	this->startColorVariance = startColorVariance;
-}
-
-cinder::ColorA ParticleSystem::getEndColor() const
-{
-	return endColor;
-}
-
-void ParticleSystem::setEndColor(const cinder::ColorA& endColor)
-{
-	this->endColor = endColor;
-}
-
-cinder::ColorA ParticleSystem::getEndColorVariance() const
-{
-	return endColorVariance;
-}
-
-void ParticleSystem::setEndColorVariance(const cinder::ColorA& endColorVariance)
-{
-	this->endColorVariance = endColorVariance;
-}
-
-void ParticleSystem::createParticles(float deltaTime)
-{
-	auto particleAmount = emissionRate * deltaTime + emissionDifference;
-	auto numberOfParticles = static_cast<std::size_t>(particleAmount);
-
-	emissionDifference = particleAmount - numberOfParticles;
-
-	addParticles(numberOfParticles);
+	for (auto& emitter : emitters)
+	{
+		emitter->update(*this, deltaTime);
+	}
 }
 
 void ParticleSystem::removeDeadParticles()

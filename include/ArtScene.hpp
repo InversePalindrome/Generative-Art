@@ -30,8 +30,5 @@ private:
 
 	int particlesToAdd;
 
-	void save();
-	void load();
-
 	void setTexture();
 };
