@@ -13,5 +13,7 @@ InversePalindrome.com
 class LinearVelocityAffector : public Affector
 {
 public:
+	LinearVelocityAffector();
+
 	virtual void update(Particle& particle, float deltaTime) override;
 };

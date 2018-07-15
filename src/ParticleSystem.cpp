@@ -128,6 +128,11 @@ void ParticleSystem::clearAffectors()
 	affectors.clear();
 }
 
+const std::vector<std::unique_ptr<Affector>>& ParticleSystem::getAffectors() const
+{
+	return affectors;
+}
+
 void ParticleSystem::addEmitter(std::unique_ptr<Emitter> emitter)
 {
 	emitters.push_back(std::move(emitter));
@@ -136,6 +141,11 @@ void ParticleSystem::addEmitter(std::unique_ptr<Emitter> emitter)
 void ParticleSystem::clearEmitters()
 {
 	emitters.clear();
+}
+
+const std::vector<std::unique_ptr<Emitter>>& ParticleSystem::getEmitters() const
+{
+	return emitters;
 }
 
 void ParticleSystem::setTexture(cinder::gl::Texture2dRef texture)

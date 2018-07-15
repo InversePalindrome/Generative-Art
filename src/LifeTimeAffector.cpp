@@ -8,6 +8,11 @@ InversePalindrome.com
 #include "LifeTimeAffector.hpp"
 
 
+LifeTimeAffector::LifeTimeAffector() :
+	Affector(AffectorType::LifeTime)
+{
+}
+
 void LifeTimeAffector::update(Particle& particle, float deltaTime)
 {
 	particle.setCurrentLifeTime(particle.getCurrentLifeTime() + deltaTime);

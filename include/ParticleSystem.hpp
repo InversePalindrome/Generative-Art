@@ -33,8 +33,12 @@ public:
 	void addAffector(std::unique_ptr<Affector> affector);
 	void clearAffectors();
 	
+	const std::vector<std::unique_ptr<Affector>>& getAffectors() const;
+
 	void addEmitter(std::unique_ptr<Emitter> emitter);
 	void clearEmitters();
+
+	const std::vector<std::unique_ptr<Emitter>>& getEmitters() const;
 
 	void setTexture(cinder::gl::Texture2dRef texture);
 

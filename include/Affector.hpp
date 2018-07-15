@@ -9,9 +9,21 @@ InversePalindrome.com
 
 #include "Particle.hpp"
 
+#include <enum.h>
+
+
+BETTER_ENUM(AffectorType, int, LifeTime, LinearVelocity, AngularVelocity, ColorGradient)
 
 class Affector
 {
 public:
+	explicit Affector(AffectorType affectorType);
+
 	virtual void update(Particle& particle, float deltaTime)=0;
+
+	AffectorType getAffectorType() const;
+
+
+private:
+	AffectorType affectorType;
 };
