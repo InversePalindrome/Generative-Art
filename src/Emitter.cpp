@@ -8,12 +8,13 @@ InversePalindrome.com
 #include "Emitter.hpp"
 
 
-Emitter::Emitter() :
+Emitter::Emitter(EmitterType emitterType) :
+	emitterType(emitterType),
 	emissionRate(5.f),
 	totalLifeTime(100.f),
 	lifeTimeVariance(0.f),
 	position(0.f, 0.f),
-	positionVariance(250.f, 250.f),
+	positionVariance(400.f, 400.f),
 	scale(1.f, 1.f),
 	scaleVariance(0.f, 0.f),
 	angle(0.f),
@@ -27,40 +28,6 @@ Emitter::Emitter() :
 	endColor(cinder::ColorA::white()),
 	endColorVariance(cinder::ColorA::white())
 {
-}
-
-void Emitter::save(pugi::xml_node& emitterNode)
-{
-	emitterNode.append_attribute("emissionRate") = emissionRate;
-	emitterNode.append_attribute("totalLifeTime") = totalLifeTime;;
-	emitterNode.append_attribute("xPosition") = position.x;
-	emitterNode.append_attribute("yPosition") = position.y;
-	emitterNode.append_attribute("xPositionVariance") = positionVariance.x;
-	emitterNode.append_attribute("yPositionVariance") = positionVariance.y;
-	emitterNode.append_attribute("widthScale") = scale.x;
-	emitterNode.append_attribute("heightScale") = scale.y;
-	emitterNode.append_attribute("widthScaleVariance") = scaleVariance.x;
-	emitterNode.append_attribute("heightScaleVariance") = scaleVariance.y;
-	emitterNode.append_attribute("angle") = angle;
-	emitterNode.append_attribute("angleVariance") = angleVariance;
-	emitterNode.append_attribute("xLinearVelocity") = linearVelocity.x;
-	emitterNode.append_attribute("yLinearVelocity") = linearVelocity.y;
-	emitterNode.append_attribute("xLinearVelocityVariance") = linearVelocityVariance.x;
-	emitterNode.append_attribute("yLinearVelocityVariance") = linearVelocityVariance.y;
-	emitterNode.append_attribute("angularVelocity") = angularVelocity;
-	emitterNode.append_attribute("angularVelocityVariance")= angularVelocityVariance;
-	emitterNode.append_attribute("startRColor") = startColor.r;
-	emitterNode.append_attribute("startGColor") = startColor.g;
-	emitterNode.append_attribute("startBColor") = startColor.b;
-	emitterNode.append_attribute("startRColorVariance") = startColorVariance.r;
-	emitterNode.append_attribute("startGColorVariance") = startColorVariance.g;
-	emitterNode.append_attribute("startBColorVariance") = startColorVariance.b;
-	emitterNode.append_attribute("endRColor") = endColor.r;
-	emitterNode.append_attribute("endGColor") = endColor.g;
-	emitterNode.append_attribute("endBColor") = endColor.b;
-	emitterNode.append_attribute("endRColorVariance") = endColorVariance.r;
-	emitterNode.append_attribute("endGColorVariance") = endColorVariance.g;
-	emitterNode.append_attribute("endBColorVariance") = endColorVariance.b;
 }
 
 void Emitter::load(const pugi::xml_node& emitterNode)
@@ -98,7 +65,7 @@ void Emitter::load(const pugi::xml_node& emitterNode)
 
 	if (widthScaleAttribute && heightScaleAttribute)
 	{
-	    setScale({ widthScaleAttribute.as_float(), heightScaleAttribute.as_float() });
+		setScale({ widthScaleAttribute.as_float(), heightScaleAttribute.as_float() });
 	}
 
 	const auto widthScaleVarianceAttribute = emitterNode.attribute("widthScaleVariance");
@@ -178,6 +145,46 @@ void Emitter::load(const pugi::xml_node& emitterNode)
 	{
 		setEndColorVariance({ endRColorVarianceAttribute.as_float(), endGColorVarianceAttribute.as_float(), endBColorVarianceAttribute.as_float() });
 	}
+}
+
+void Emitter::save(pugi::xml_node& emitterNode) const
+{
+	emitterNode.append_attribute("type") = emitterType._to_string();
+	emitterNode.append_attribute("emissionRate") = emissionRate;
+	emitterNode.append_attribute("totalLifeTime") = totalLifeTime;;
+	emitterNode.append_attribute("xPosition") = position.x;
+	emitterNode.append_attribute("yPosition") = position.y;
+	emitterNode.append_attribute("xPositionVariance") = positionVariance.x;
+	emitterNode.append_attribute("yPositionVariance") = positionVariance.y;
+	emitterNode.append_attribute("widthScale") = scale.x;
+	emitterNode.append_attribute("heightScale") = scale.y;
+	emitterNode.append_attribute("widthScaleVariance") = scaleVariance.x;
+	emitterNode.append_attribute("heightScaleVariance") = scaleVariance.y;
+	emitterNode.append_attribute("angle") = angle;
+	emitterNode.append_attribute("angleVariance") = angleVariance;
+	emitterNode.append_attribute("xLinearVelocity") = linearVelocity.x;
+	emitterNode.append_attribute("yLinearVelocity") = linearVelocity.y;
+	emitterNode.append_attribute("xLinearVelocityVariance") = linearVelocityVariance.x;
+	emitterNode.append_attribute("yLinearVelocityVariance") = linearVelocityVariance.y;
+	emitterNode.append_attribute("angularVelocity") = angularVelocity;
+	emitterNode.append_attribute("angularVelocityVariance")= angularVelocityVariance;
+	emitterNode.append_attribute("startRColor") = startColor.r;
+	emitterNode.append_attribute("startGColor") = startColor.g;
+	emitterNode.append_attribute("startBColor") = startColor.b;
+	emitterNode.append_attribute("startRColorVariance") = startColorVariance.r;
+	emitterNode.append_attribute("startGColorVariance") = startColorVariance.g;
+	emitterNode.append_attribute("startBColorVariance") = startColorVariance.b;
+	emitterNode.append_attribute("endRColor") = endColor.r;
+	emitterNode.append_attribute("endGColor") = endColor.g;
+	emitterNode.append_attribute("endBColor") = endColor.b;
+	emitterNode.append_attribute("endRColorVariance") = endColorVariance.r;
+	emitterNode.append_attribute("endGColorVariance") = endColorVariance.g;
+	emitterNode.append_attribute("endBColorVariance") = endColorVariance.b;
+}
+
+EmitterType Emitter::getEmitterType() const
+{
+	return emitterType;
 }
 
 float Emitter::getEmissionRate() const

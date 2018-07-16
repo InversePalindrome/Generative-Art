@@ -12,18 +12,25 @@ InversePalindrome.com
 
 #include <pugixml.hpp>
 
+#include <enum.h>
+
+
+BETTER_ENUM(EmitterType, int, Default);
 
 class ParticleSystem;
 
 class Emitter
 {
-public:
-	Emitter();
+	friend class ArtScene;
 
+public:
+	explicit Emitter(EmitterType emitterType);
+
+	virtual void load(const pugi::xml_node& emitterNode);
+	virtual void save(pugi::xml_node& emitterNode) const;
 	virtual void update(ParticleSystem& particleSystem, float deltaTime) = 0;
 
-	void save(pugi::xml_node& emitterNode);
-	void load(const pugi::xml_node& emitterNode);
+	EmitterType getEmitterType() const;
 
 	float getEmissionRate() const;
 	void setEmissionRate(float emissionRate);
@@ -77,6 +84,8 @@ public:
 	void setEndColorVariance(const cinder::ColorA& endColorVariance);
 
 private:
+	EmitterType emitterType;
+
 	float emissionRate;
 
 	float totalLifeTime;

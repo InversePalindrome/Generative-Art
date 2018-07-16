@@ -19,16 +19,15 @@ InversePalindrome.com
 
 class ParticleSystem
 {
-	friend class ArtScene;
-
 public:
 	void load(const std::string& filename);
-	void save(const std::string& filename);
+	void save(const std::string& filename) const;
 
 	void update(float deltaTime);
 	void draw();
 
-	void emitParticle(const Particle& particle);
+	void addParticle(const Particle& particle);
+	void clearParticles();
 
 	void addAffector(std::unique_ptr<Affector> affector);
 	void clearAffectors();

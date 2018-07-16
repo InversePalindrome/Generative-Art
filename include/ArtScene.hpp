@@ -26,8 +26,6 @@ private:
 
 	ParticleSystem particleSystem;
 
-	std::experimental::filesystem::path texturePath;
-
 	int particlesToAdd;
 	int currentAffectorType;
 	int currentEmitterType;
@@ -37,6 +35,7 @@ private:
 	void addMenuBar();
 
 	void addParticleSystemTree();
+	void addClearParticles();
 	void addAffectorNode();
 	void addEmitterNode();
 };

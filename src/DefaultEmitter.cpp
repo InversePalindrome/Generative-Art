@@ -13,6 +13,7 @@ InversePalindrome.com
 
 
 DefaultEmitter::DefaultEmitter() :
+	Emitter(EmitterType::Default),
 	emissionDifference(0.f)
 {
 }
@@ -23,15 +24,15 @@ void DefaultEmitter::update(ParticleSystem& particleSystem, float deltaTime)
 	{
 		Particle particle;
 		particle.setTotalLifeTime(getTotalLifeTime() + getLifeTimeVariance() * cinder::randFloat(-1.f, 1.f));
-		particle.setPosition({ getPosition() + getPositionVariance() * cinder::randFloat(-1.f, 1.f) });
-		particle.setScale({ getScale() + getScaleVariance() * cinder::randFloat(-1.f, 1.f) });
-		particle.setAngle(getAngle() + getAngleVariance() * cinder::randFloat(-1.f, 1.f));
-		particle.setLinearVelocity({ getLinearVelocity() + getLinearVelocityVariance() * cinder::randFloat(-1.f, 1.f) });
+		particle.setPosition(getPosition() + getPositionVariance() * cinder::vec2(cinder::randFloat(-1.f, 1.f), cinder::randFloat(-1.f, 1.f)));
+		particle.setScale( getScale() + getScaleVariance() * cinder::vec2(cinder::randFloat(-1.f, 1.f), cinder::randFloat(-1.f, 1.f)));
+		particle.setAngle(getAngle() + getAngleVariance() * cinder::randFloat());
+		particle.setLinearVelocity( getLinearVelocity() + getLinearVelocityVariance() * cinder::vec2(cinder::randFloat(-1.f, 1.f), cinder::randFloat(-1.f, 1.f)));
 		particle.setAngularVelocity(getAngularVelocity() + getAngularVelocityVariance() * cinder::randFloat(-1.f, 1.f));
-		particle.setColor(getStartColor() + getStartColorVariance() * cinder::randFloat(-1.f, 1.f));
-		particle.setEndColor(getEndColor() + getEndColorVariance() * cinder::randFloat(-1.f, 1.f));
-
-		particleSystem.emitParticle(particle);
+		particle.setColor(getStartColor() + getStartColorVariance() * cinder::ColorA(cinder::randFloat(), cinder::randFloat(), cinder::randFloat()));
+		particle.setEndColor(getEndColor() + getEndColorVariance() * cinder::ColorA(cinder::randFloat(), cinder::randFloat(), cinder::randFloat()));
+	
+		particleSystem.addParticle(particle);
 	}
 }
 

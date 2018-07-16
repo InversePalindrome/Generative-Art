@@ -10,4 +10,4 @@ InversePalindrome.com
 #include <enum.h>
 
 
-BETTER_ENUM(Texture, int, SplashScreen, Star, Bubble)
+BETTER_ENUM(Texture, int, SplashScreen, DefaultParticle)

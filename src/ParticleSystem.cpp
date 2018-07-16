@@ -22,43 +22,45 @@ InversePalindrome.com
 void ParticleSystem::load(const std::string& filename)
 {
 	pugi::xml_document doc;
-
-	if (doc.load(filename.c_str()))
+	
+	if (doc.load_file(filename.c_str()))
 	{
 		if (const auto particleSystemNode = doc.child("ParticleSystem"))
 		{
-			for (const auto emitterNode : particleSystemNode.children("Emitter"))
-			{
-				if (const auto emitterTypeAttribute = emitterNode.attribute("type"))
-				{
-					if (std::strcmp(emitterTypeAttribute.as_string(), "default"))
-					{
-						DefaultEmitter defaultEmitter;
-						defaultEmitter.load(emitterNode);
-
-						emitters.push_back(std::make_unique<DefaultEmitter>());
-					}
-				}
-			}
 			for (const auto affectorNode : particleSystemNode.children("Affector"))
 			{
 				if (const auto affectorTypeAttribute = affectorNode.attribute("type"))
 				{
-					if (std::strcmp(affectorTypeAttribute.as_string(), "lifeTime"))
+					switch (AffectorType::_from_string(affectorTypeAttribute.as_string()))
 					{
+					case AffectorType::LifeTime:
 						affectors.push_back(std::make_unique<LifeTimeAffector>());
-					}
-					else if (std::strcmp(affectorTypeAttribute.as_string(), "linearVelocity"))
-					{
+						break;
+					case AffectorType::LinearVelocity:
 						affectors.push_back(std::make_unique<LinearVelocityAffector>());
-					}
-					else if (std::strcmp(affectorTypeAttribute.as_string(), "angularVelocity"))
-					{
+						break;
+					case AffectorType::AngularVelocity:
 						affectors.push_back(std::make_unique<AngularVelocityAffector>());
-					}
-					else if (std::strcmp(affectorTypeAttribute.as_string(), "colorGradient"))
-					{
+						break;
+					case AffectorType::ColorGradient:
 						affectors.push_back(std::make_unique<ColorGradientAffector>());
+						break;
+					}
+				}
+			}
+
+			for (const auto emitterNode : particleSystemNode.children("Emitter"))
+			{
+				if (const auto emitterTypeAttribute = emitterNode.attribute("type"))
+				{
+					switch (EmitterType::_from_string(emitterTypeAttribute.as_string()))
+					{
+					case EmitterType::Default:
+						DefaultEmitter defaultEmitter;
+						defaultEmitter.load(emitterNode);
+
+						emitters.push_back(std::make_unique<DefaultEmitter>());
+						break;
 					}
 				}
 			}
@@ -66,7 +68,7 @@ void ParticleSystem::load(const std::string& filename)
 	}
 }
 
-void ParticleSystem::save(const std::string& filename)
+void ParticleSystem::save(const std::string& filename) const
 {
 	pugi::xml_document doc;
 
@@ -76,13 +78,13 @@ void ParticleSystem::save(const std::string& filename)
 
 	auto particleSystemNode = doc.append_child("ParticleSystem");
 
+	for (const auto& affector : affectors)
+	{
+		affector->save(particleSystemNode.append_child("Affector"));
+	}
 	for (const auto& emitter : emitters)
 	{
 		emitter->save(particleSystemNode.append_child("Emitter"));
-	}
-	for (const auto& affector : affectors)
-	{
-
 	}
 
 	doc.save_file(filename.c_str());
@@ -113,9 +115,14 @@ void ParticleSystem::draw()
 	}
 }
 
-void ParticleSystem::emitParticle(const Particle& particle)
+void ParticleSystem::addParticle(const Particle& particle)
 {
 	particles.push_back(particle);
+}
+
+void ParticleSystem::clearParticles()
+{
+	particles.clear();
 }
 
 void ParticleSystem::addAffector(std::unique_ptr<Affector> affector)
