@@ -15,6 +15,7 @@ InversePalindrome.com
 void Application::initSettings(cinder::app::App::Settings* settings)
 {
 	settings->setTitle("Generative Art");
+	settings->setWindowSize(800, 600);
 }
 
 void Application::setup()

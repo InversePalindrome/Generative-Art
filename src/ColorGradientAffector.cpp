@@ -15,5 +15,5 @@ ColorGradientAffector::ColorGradientAffector() :
 
 void ColorGradientAffector::update(Particle& particle, float deltaTime)
 {
-	particle.setColor((particle.getEndColor() - particle.getColor()) * (1 / particle.getTotalLifeTime()) + particle.getColor());
+	particle.setColor(particle.getColor() + (particle.getEndColor() - particle.getColor()) * (deltaTime / particle.getTotalLifeTime()));
 }

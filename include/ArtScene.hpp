@@ -35,6 +35,7 @@ private:
 
 	void addMenuBar();
 	void addParticleSystemTree();
+	void addPauseParticles();
 	void addClearParticles();
 	void addAffectorsNode();
 	void addEmittersNode();

@@ -15,7 +15,7 @@ InversePalindrome.com
 
 #include <CinderImGui.h>
 
-#include <cinder/app/AppBase.h>
+#include <cinder/app/App.h>
 
 
 ArtScene::ArtScene(SceneManager& sceneManager) :
@@ -55,7 +55,16 @@ void ArtScene::draw()
 
 void ArtScene::addTexture()
 {
-	particleSystem.addTexture(cinder::app::getOpenFilePath().string());
+	const auto textureFilepath = cinder::app::getOpenFilePath();
+	
+	try
+	{
+		particleSystem.addTexture(cinder::gl::Texture2d::create(cinder::loadImage(textureFilepath)), textureFilepath.string());
+	}
+	catch (...)
+	{
+		cinder::app::console() << "Unable to load texture" << std::endl;
+	}
 }
 
 void ArtScene::addMenuBar()
@@ -84,12 +93,33 @@ void ArtScene::addParticleSystemTree()
 {
 	if (ImGui::TreeNode("Particle System"))
 	{
+		addPauseParticles();
 		addClearParticles();
 		addAffectorsNode();
 		addEmittersNode();
 		addTexturesNode();
 
 		ImGui::TreePop();
+	}
+}
+
+void ArtScene::addPauseParticles()
+{
+	ImGui::SameLine();
+
+	if (particleSystem.isPaused())
+	{
+		if(ImGui::Button("Resume"))
+		{
+			particleSystem.setPauseStatus(false);
+		}
+	}
+	else
+	{
+		if (ImGui::Button("Pause"))
+		{
+			particleSystem.setPauseStatus(true);
+		}
 	}
 }
 
@@ -237,7 +267,13 @@ void ArtScene::addEmittersNode()
 
 			if (isEmitterOpen)
 			{
+				ImGui::PushItemWidth(40.f);
+
 				ImGui::InputFloat("Emission Rate", &emitter->emissionRate);
+
+				ImGui::PopItemWidth();
+
+				ImGui::PushItemWidth(70.f);
 
 				ImGui::InputInt("Texture Index", &emitter->textureIndex);
 
@@ -245,11 +281,19 @@ void ArtScene::addEmittersNode()
 
 				ImGui::InputInt("Texture Index Variance", &emitter->textureIndexVariance);
 
+				ImGui::PopItemWidth();
+
+				ImGui::PushItemWidth(60.f);
+
 				ImGui::InputFloat("Life Time", &emitter->totalLifeTime);
 
 				ImGui::SameLine();
 
 				ImGui::InputFloat("Life Time Variance", &emitter->lifeTimeVariance);
+
+				ImGui::PopItemWidth();
+
+				ImGui::PushItemWidth(95.f);
 
 				ImGui::InputFloat2("Position(x, y)", &emitter->position[0]);
 
@@ -257,11 +301,19 @@ void ArtScene::addEmittersNode()
 
 				ImGui::InputFloat2("Position Variance(x, y)", &emitter->positionVariance[0]);
 
+				ImGui::PopItemWidth();
+
+				ImGui::PushItemWidth(55.f);
+
 				ImGui::InputFloat2("Scale(width, height)", &emitter->scale[0]);
 
 				ImGui::SameLine();
 
 				ImGui::InputFloat2("Scale Variance(width, height)", &emitter->scaleVariance[0]);
+
+				ImGui::PopItemWidth();
+
+				ImGui::PushItemWidth(40.f);
 
 				ImGui::InputFloat("Angle", &emitter->angle);
 
@@ -269,17 +321,29 @@ void ArtScene::addEmittersNode()
 
 				ImGui::InputFloat("Angle Variance", &emitter->angleVariance);
 
-				ImGui::InputFloat2("Linear Velocity", &emitter->linearVelocity[0]);
+				ImGui::PopItemWidth();
+
+				ImGui::PushItemWidth(95.f);
+
+				ImGui::InputFloat2("Linear Velocity(x, y)", &emitter->linearVelocity[0]);
 
 				ImGui::SameLine();
 
-				ImGui::InputFloat2("Linear Velocity Variance", &emitter->linearVelocityVariance[0]);
+				ImGui::InputFloat2("Linear Velocity Variance(x, y)", &emitter->linearVelocityVariance[0]);
+
+				ImGui::PopItemWidth();
+
+				ImGui::PushItemWidth(45.f);
 
 				ImGui::InputFloat("Angular Velocity", &emitter->angularVelocity);
 
 				ImGui::SameLine();
 
 				ImGui::InputFloat("Angular Velocity Variance", &emitter->angularVelocityVariance);
+
+				ImGui::PopItemWidth();
+
+				ImGui::PushItemWidth(150.f);
 
 				ImGui::ColorEdit3("Start Color", &emitter->startColor[0]);
 
@@ -292,6 +356,8 @@ void ArtScene::addEmittersNode()
 				ImGui::SameLine();
 
 				ImGui::ColorEdit3("End Color Variance", &emitter->endColorVariance[0]);
+
+				ImGui::PopItemWidth();
 
 				ImGui::TreePop();
 			}
@@ -327,18 +393,20 @@ void ArtScene::addTexturesNode()
 
 		for (const auto& texture : particleSystem.getTextures())
 		{
-			ImGui::Image(texture.second, texture.second->getSize());
+			ImGui::Image(texture, texture->getSize());
 
 			ImGui::SameLine();
 
-			ImGui::PushID(textureIndex++);
+			ImGui::PushID(textureIndex);
 			
 			if (ImGui::Button("Remove##removeTexture"))
 			{
-				removalCallbacks.push_back([this, &texture]() { particleSystem.removeTexture(texture.second); });
+				removalCallbacks.push_back([this, textureIndex]() { particleSystem.removeTexture(textureIndex); });
 			}
 
 			ImGui::PopID();
+
+			++textureIndex;
 		}
 
 		ImGui::TreePop();

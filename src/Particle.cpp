@@ -10,7 +10,7 @@ InversePalindrome.com
 
 Particle::Particle() :
 	textureIndex(0),
-	totalLifeTime(100.f),
+	totalLifeTime(10.f),
 	currentLifeTime(0.f),
 	position(0.f, 0.f),
 	scale(1.f, 1.f),

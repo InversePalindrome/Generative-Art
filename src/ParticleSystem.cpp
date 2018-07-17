@@ -12,12 +12,16 @@ InversePalindrome.com
 #include "LinearVelocityAffector.hpp"
 #include "AngularVelocityAffector.hpp"
 
-#include <cinder/app/App.h>
 #include <cinder/gl/draw.h>
 #include <cinder/gl/wrapper.h>
 
 #include <pugixml.hpp>
 
+
+ParticleSystem::ParticleSystem() :
+	pauseStatus(false)
+{
+}
 
 void ParticleSystem::load(const std::string& filename)
 {
@@ -69,7 +73,7 @@ void ParticleSystem::load(const std::string& filename)
 			{
 				if (const auto filenameAttribute = textureNode.attribute("filename"))
 				{
-					addTexture(filenameAttribute.as_string());
+					addTexture(cinder::gl::Texture2d::create(cinder::loadImage(filenameAttribute.as_string())), filenameAttribute.as_string());
 				}
 			}
 		}
@@ -94,9 +98,9 @@ void ParticleSystem::save(const std::string& filename) const
 	{
 		emitter->save(particleSystemNode.append_child("Emitter"));
 	}
-	for (const auto& textureFilename : textures)
+	for (const auto& textureFilename : textureFilenames)
 	{
-		particleSystemNode.append_child("Texture").append_attribute("filename") = textureFilename.first.c_str();
+		particleSystemNode.append_child("Texture").append_attribute("filename") = textureFilename.c_str();
 	}
 
 	doc.save_file(filename.c_str());
@@ -104,10 +108,13 @@ void ParticleSystem::save(const std::string& filename) const
 
 void ParticleSystem::update(float deltaTime)
 {
-	updateAffectors(deltaTime);
-	updateEmitters(deltaTime);
+	if (!isPaused())
+	{
+		updateAffectors(deltaTime);
+		updateEmitters(deltaTime);
 
-	removeDeadParticles();
+		removeDeadParticles();
+	}
 }
 
 void ParticleSystem::draw()
@@ -123,7 +130,7 @@ void ParticleSystem::draw()
 			cinder::gl::rotate(particle.getAngle());
 			cinder::gl::color(particle.getColor());
 
-			cinder::gl::draw(textures.at(particle.getTextureIndex()).second);
+			cinder::gl::draw(textures.at(particle.getTextureIndex()));
 
 			cinder::gl::popModelMatrix();
 		}
@@ -180,31 +187,37 @@ const std::vector<std::unique_ptr<Emitter>>& ParticleSystem::getEmitters() const
 	return emitters;
 }
 
-void ParticleSystem::addTexture(const std::string& filename)
+void ParticleSystem::addTexture(const cinder::gl::Texture2dRef& texture, const std::string& textureFilename)
 {
-	try
-	{
-		textures.push_back({ filename, cinder::gl::Texture2d::create(cinder::loadImage(filename)) });
-	}
-	catch (...)
-	{
-		cinder::app::console() << "Unable to load texture" << std::endl;
-	}
+	textures.push_back(texture);
+	textureFilenames.push_back(textureFilename);
 }
 
-void ParticleSystem::removeTexture(const cinder::gl::Texture2dRef& texture)
+void ParticleSystem::removeTexture(std::size_t textureIndex)
 {
-	textures.erase(std::remove_if(std::begin(textures), std::end(textures), [&texture](const auto& textureData) { return texture == textureData.second; }), std::end(textures));
+	textures.erase(std::begin(textures) + textureIndex);
+	textureFilenames.erase(std::begin(textureFilenames) + textureIndex);
 }
 
 void ParticleSystem::clearTextures()
 {
 	textures.clear();
+	textureFilenames.clear();
 }
 
-const std::vector<std::pair<std::string, cinder::gl::Texture2dRef>>& ParticleSystem::getTextures() const
+const std::vector<cinder::gl::Texture2dRef>& ParticleSystem::getTextures() const
 {
 	return textures;
+}
+
+bool ParticleSystem::isPaused() const
+{
+	return pauseStatus;
+}
+
+void ParticleSystem::setPauseStatus(bool pauseStatus)
+{
+	this->pauseStatus = pauseStatus;
 }
 
 void ParticleSystem::updateAffectors(float deltaTime)

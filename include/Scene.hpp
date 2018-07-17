@@ -7,8 +7,8 @@ InversePalindrome.com
 
 #pragma once
 
-class SceneManager;
 
+class SceneManager;
 
 class Scene
 {

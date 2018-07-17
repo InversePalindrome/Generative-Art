@@ -20,6 +20,8 @@ InversePalindrome.com
 class ParticleSystem
 {
 public:
+	ParticleSystem();
+
 	void load(const std::string& filename);
 	void save(const std::string& filename) const;
 
@@ -41,17 +43,23 @@ public:
 
 	const std::vector<std::unique_ptr<Emitter>>& getEmitters() const;
 
-	void addTexture(const std::string& filename);
-	void removeTexture(const cinder::gl::Texture2dRef& texture);
+	void addTexture(const cinder::gl::Texture2dRef& texture, const std::string& textureFilename);
+	void removeTexture(std::size_t textureIndex);
 	void clearTextures();
 
-	const std::vector<std::pair<std::string, cinder::gl::Texture2dRef>>& getTextures() const;
+	const std::vector<cinder::gl::Texture2dRef>& getTextures() const;
+
+	bool isPaused() const;
+	void setPauseStatus(bool pauseStatus);
 
 private:
 	std::vector<Particle> particles;
 	std::vector<std::unique_ptr<Affector>> affectors;
 	std::vector<std::unique_ptr<Emitter>> emitters;
-	std::vector<std::pair<std::string, cinder::gl::Texture2dRef>> textures;
+	std::vector<cinder::gl::Texture2dRef> textures;
+	std::vector<std::string> textureFilenames;
+
+	bool pauseStatus;
 
 	void updateAffectors(float deltaTime);
 	void updateEmitters(float deltaTime);

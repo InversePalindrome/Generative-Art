@@ -7,16 +7,18 @@ InversePalindrome.com
 
 #include "Emitter.hpp"
 
+#include <cinder/app/App.h>
+
 
 Emitter::Emitter(EmitterType emitterType) :
 	emitterType(emitterType),
 	textureIndex(0),
 	textureIndexVariance(0),
 	emissionRate(5.f),
-	totalLifeTime(100.f),
+	totalLifeTime(10.f),
 	lifeTimeVariance(0.f),
-	position(0.f, 0.f),
-	positionVariance(400.f, 400.f),
+	position(cinder::app::getWindowWidth() / 2.f, cinder::app::getWindowHeight() / 2.f),
+	positionVariance(cinder::app::getWindowWidth() / 2.f, cinder::app::getWindowHeight() / 2.f),
 	scale(1.f, 1.f),
 	scaleVariance(0.f, 0.f),
 	angle(0.f),
@@ -26,9 +28,9 @@ Emitter::Emitter(EmitterType emitterType) :
 	angularVelocity(0.f),
 	angularVelocityVariance(0.f),
 	startColor(cinder::ColorA::white()),
-	startColorVariance(cinder::ColorA::white()),
+	startColorVariance(cinder::ColorA::black()),
 	endColor(cinder::ColorA::white()),
-	endColorVariance(cinder::ColorA::white())
+	endColorVariance(cinder::ColorA::black())
 {
 }
 
