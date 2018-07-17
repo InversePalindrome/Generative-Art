@@ -35,6 +35,12 @@ public:
 	float getEmissionRate() const;
 	void setEmissionRate(float emissionRate);
 
+	int getTextureIndex() const;
+	void setTextureIndex(int textureIndex);
+
+	int getTextureIndexVariance() const;
+	void setTextureIndexVariance(int textureIndexVariance);
+
 	float getTotalLifeTime() const;
 	void setTotalLifeTime(float totalLifeTime);
 
@@ -87,6 +93,9 @@ private:
 	EmitterType emitterType;
 
 	float emissionRate;
+
+	int textureIndex;
+	int textureIndexVariance;
 
 	float totalLifeTime;
 	float lifeTimeVariance;

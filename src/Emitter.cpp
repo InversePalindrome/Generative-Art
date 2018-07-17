@@ -10,6 +10,8 @@ InversePalindrome.com
 
 Emitter::Emitter(EmitterType emitterType) :
 	emitterType(emitterType),
+	textureIndex(0),
+	textureIndexVariance(0),
 	emissionRate(5.f),
 	totalLifeTime(100.f),
 	lifeTimeVariance(0.f),
@@ -32,6 +34,14 @@ Emitter::Emitter(EmitterType emitterType) :
 
 void Emitter::load(const pugi::xml_node& emitterNode)
 {
+	if (const auto textureIndexAttribute = emitterNode.attribute("textureIndex"))
+	{
+		setTextureIndex(textureIndexAttribute.as_int());
+	}
+	if (const auto textureIndexVarianceAttribute = emitterNode.attribute("textureIndexVariance"))
+	{
+		setTextureIndexVariance(textureIndexVarianceAttribute.as_int());
+	}
 	if (const auto emissionRateAttribute = emitterNode.attribute("emissionRate"))
 	{
 		setEmissionRate(emissionRateAttribute.as_float());
@@ -151,6 +161,8 @@ void Emitter::save(pugi::xml_node& emitterNode) const
 {
 	emitterNode.append_attribute("type") = emitterType._to_string();
 	emitterNode.append_attribute("emissionRate") = emissionRate;
+	emitterNode.append_attribute("textureIndex") = textureIndex;
+	emitterNode.append_attribute("textureIndexVariance") = textureIndexVariance;
 	emitterNode.append_attribute("totalLifeTime") = totalLifeTime;;
 	emitterNode.append_attribute("xPosition") = position.x;
 	emitterNode.append_attribute("yPosition") = position.y;
@@ -195,6 +207,26 @@ float Emitter::getEmissionRate() const
 void Emitter::setEmissionRate(float emissionRate)
 {
 	this->emissionRate = emissionRate;
+}
+
+int Emitter::getTextureIndex() const
+{
+	return textureIndex;
+}
+
+void Emitter::setTextureIndex(int textureIndex)
+{
+	this->textureIndex = textureIndex;
+}
+
+int Emitter::getTextureIndexVariance() const
+{
+	return textureIndexVariance;
+}
+
+void Emitter::setTextureIndexVariance(int textureIndexVariance)
+{
+	this->textureIndexVariance = textureIndexVariance;
 }
 
 float Emitter::getTotalLifeTime() const

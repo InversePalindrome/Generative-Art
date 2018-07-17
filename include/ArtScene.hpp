@@ -25,17 +25,20 @@ private:
 	cinder::Timer timer;
 
 	ParticleSystem particleSystem;
+	std::vector<std::function<void()>> removalCallbacks;
 
 	int particlesToAdd;
 	int currentAffectorType;
 	int currentEmitterType;
 
-	void setTexture();
+	void addTexture();
 
 	void addMenuBar();
-
 	void addParticleSystemTree();
 	void addClearParticles();
-	void addAffectorNode();
-	void addEmitterNode();
+	void addAffectorsNode();
+	void addEmittersNode();
+	void addTexturesNode();
+
+	void updateRemovals();
 };

@@ -41,6 +41,8 @@ void ArtScene::update()
 
 	ImGui::End();
 
+	updateRemovals();
+
 	particleSystem.update(static_cast<float>(timer.getSeconds()));
 
 	timer.start();
@@ -51,21 +53,9 @@ void ArtScene::draw()
 	particleSystem.draw();
 }
 
-void ArtScene::setTexture()
+void ArtScene::addTexture()
 {
-	try
-	{
-		const auto texturePath = cinder::app::getOpenFilePath();
-
-		if (!texturePath.empty())
-		{
-			particleSystem.setTexture(cinder::gl::Texture2d::create(cinder::loadImage(texturePath)));
-		}
-	}
-	catch (...)
-	{
-		cinder::app::console() << "Unable to load texture" << std::endl;
-	}
+	particleSystem.addTexture(cinder::app::getOpenFilePath().string());
 }
 
 void ArtScene::addMenuBar()
@@ -82,11 +72,7 @@ void ArtScene::addMenuBar()
 			{
 				particleSystem.save(cinder::app::getSaveFilePath().string());
 			}
-			if (ImGui::MenuItem("Set Texture"))
-			{
-				setTexture();
-			}
-
+			
 			ImGui::EndMenu();
 		}
 
@@ -99,8 +85,9 @@ void ArtScene::addParticleSystemTree()
 	if (ImGui::TreeNode("Particle System"))
 	{
 		addClearParticles();
-		addAffectorNode();
-		addEmitterNode();
+		addAffectorsNode();
+		addEmittersNode();
+		addTexturesNode();
 
 		ImGui::TreePop();
 	}
@@ -116,7 +103,7 @@ void ArtScene::addClearParticles()
 	}
 }
 
-void ArtScene::addAffectorNode()
+void ArtScene::addAffectorsNode()
 {
 	auto isAffectorsOpen = ImGui::TreeNode("Affectors");
 
@@ -168,16 +155,29 @@ void ArtScene::addAffectorNode()
 
 	if (isAffectorsOpen)
 	{
+		std::size_t affectorID = 0;
+
 		for (const auto& affector : particleSystem.getAffectors())
 		{
 			ImGui::Text(affector->getAffectorType()._to_string());
+
+			ImGui::SameLine();
+
+			ImGui::PushID(++affectorID);
+
+			if (ImGui::Button("Remove##removeAffector"))
+			{
+				removalCallbacks.push_back([this, &affector]() { particleSystem.removeAffector(affector); });
+			}
+
+			ImGui::PopID();
 		}
 
 		ImGui::TreePop();
 	}
 }
 
-void ArtScene::addEmitterNode()
+void ArtScene::addEmittersNode()
 {
 	auto isEmittersOpen = ImGui::TreeNode("Emitters");
 
@@ -220,11 +220,30 @@ void ArtScene::addEmitterNode()
 
 	if (isEmittersOpen)
 	{
+		std::size_t emitterID = 0;
+
 		for (auto& emitter : particleSystem.getEmitters())
 		{
-			if (ImGui::TreeNode(emitter->getEmitterType()._to_string()))
+			ImGui::PushID(++emitterID);
+
+			auto isEmitterOpen = ImGui::TreeNode(emitter->getEmitterType()._to_string());
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Remove##removeEmitter"))
+			{
+				removalCallbacks.push_back([this, &emitter]() { particleSystem.removeEmitter(emitter); });
+			}
+
+			if (isEmitterOpen)
 			{
 				ImGui::InputFloat("Emission Rate", &emitter->emissionRate);
+
+				ImGui::InputInt("Texture Index", &emitter->textureIndex);
+
+				ImGui::SameLine();
+
+				ImGui::InputInt("Texture Index Variance", &emitter->textureIndexVariance);
 
 				ImGui::InputFloat("Life Time", &emitter->totalLifeTime);
 
@@ -276,8 +295,62 @@ void ArtScene::addEmitterNode()
 
 				ImGui::TreePop();
 			}
+
+			ImGui::PopID();
 		}
 
 		ImGui::TreePop();
 	}
+}
+
+void ArtScene::addTexturesNode()
+{
+	auto isTexturesOpen = ImGui::TreeNode("Textures");
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Add##addTexture"))
+	{
+		addTexture();
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Clear##clearTextures"))
+	{
+		particleSystem.clearTextures();
+	}
+
+	if (isTexturesOpen)
+	{
+		std::size_t textureIndex = 0;
+
+		for (const auto& texture : particleSystem.getTextures())
+		{
+			ImGui::Image(texture.second, texture.second->getSize());
+
+			ImGui::SameLine();
+
+			ImGui::PushID(textureIndex++);
+			
+			if (ImGui::Button("Remove##removeTexture"))
+			{
+				removalCallbacks.push_back([this, &texture]() { particleSystem.removeTexture(texture.second); });
+			}
+
+			ImGui::PopID();
+		}
+
+		ImGui::TreePop();
+	}
+}
+
+void ArtScene::updateRemovals()
+{
+	for (const auto& removal : removalCallbacks)
+	{
+		removal();
+	}
+
+	removalCallbacks.clear();
 }

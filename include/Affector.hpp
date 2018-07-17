@@ -26,7 +26,7 @@ public:
 	virtual void update(Particle& particle, float deltaTime)=0;
 
 	AffectorType getAffectorType() const;
-
+	
 private:
 	AffectorType affectorType;
 };

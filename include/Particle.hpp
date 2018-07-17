@@ -16,6 +16,9 @@ class Particle
 public:
 	Particle();
 
+	int getTextureIndex() const;
+	void setTextureIndex(int textureIndex);
+
 	float getTotalLifeTime() const;
 	void setTotalLifeTime(float totalLifeTime);
 
@@ -44,6 +47,8 @@ public:
 	void setEndColor(const cinder::ColorA& endColor);
 
 private:
+	int textureIndex;
+
 	float totalLifeTime;
 	float currentLifeTime;
 

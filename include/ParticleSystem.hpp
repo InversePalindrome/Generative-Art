@@ -30,23 +30,28 @@ public:
 	void clearParticles();
 
 	void addAffector(std::unique_ptr<Affector> affector);
+	void removeAffector(const std::unique_ptr<Affector>& affector);
 	void clearAffectors();
 	
 	const std::vector<std::unique_ptr<Affector>>& getAffectors() const;
 
 	void addEmitter(std::unique_ptr<Emitter> emitter);
+	void removeEmitter(const std::unique_ptr<Emitter>& emitter);
 	void clearEmitters();
 
 	const std::vector<std::unique_ptr<Emitter>>& getEmitters() const;
 
-	void setTexture(cinder::gl::Texture2dRef texture);
+	void addTexture(const std::string& filename);
+	void removeTexture(const cinder::gl::Texture2dRef& texture);
+	void clearTextures();
+
+	const std::vector<std::pair<std::string, cinder::gl::Texture2dRef>>& getTextures() const;
 
 private:
 	std::vector<Particle> particles;
 	std::vector<std::unique_ptr<Affector>> affectors;
 	std::vector<std::unique_ptr<Emitter>> emitters;
-
-	cinder::gl::Texture2dRef texture;
+	std::vector<std::pair<std::string, cinder::gl::Texture2dRef>> textures;
 
 	void updateAffectors(float deltaTime);
 	void updateEmitters(float deltaTime);

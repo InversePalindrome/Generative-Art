@@ -9,6 +9,7 @@ InversePalindrome.com
 
 
 Particle::Particle() :
+	textureIndex(0),
 	totalLifeTime(100.f),
 	currentLifeTime(0.f),
 	position(0.f, 0.f),
@@ -19,6 +20,16 @@ Particle::Particle() :
 	color(cinder::ColorA::white()),
 	endColor(cinder::ColorA::white())
 {
+}
+
+int Particle::getTextureIndex() const
+{
+	return textureIndex;
+}
+
+void Particle::setTextureIndex(int textureIndex)
+{
+	this->textureIndex = textureIndex;
 }
 
 float Particle::getTotalLifeTime() const

@@ -23,6 +23,7 @@ void DefaultEmitter::update(ParticleSystem& particleSystem, float deltaTime)
 	for (std::size_t i = 0; i < numberOfEmittedParticles(deltaTime); ++i)
 	{
 		Particle particle;
+		particle.setTextureIndex(getTextureIndex() + cinder::randInt(getTextureIndexVariance()));
 		particle.setTotalLifeTime(getTotalLifeTime() + getLifeTimeVariance() * cinder::randFloat(-1.f, 1.f));
 		particle.setPosition(getPosition() + getPositionVariance() * cinder::vec2(cinder::randFloat(-1.f, 1.f), cinder::randFloat(-1.f, 1.f)));
 		particle.setScale( getScale() + getScaleVariance() * cinder::vec2(cinder::randFloat(-1.f, 1.f), cinder::randFloat(-1.f, 1.f)));
