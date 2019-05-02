@@ -13,11 +13,11 @@ class SceneManager;
 class Scene
 {
 public:
-	explicit Scene(SceneManager& sceneManager);
+    explicit Scene(SceneManager& sceneManager);
 
-	virtual void update() = 0;
-	virtual void draw() = 0;
+    virtual void update() = 0;
+    virtual void draw() = 0;
 
 protected:
-	SceneManager& sceneManager;
+    SceneManager& sceneManager;
 };

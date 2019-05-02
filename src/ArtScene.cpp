@@ -19,406 +19,406 @@ InversePalindrome.com
 
 
 ArtScene::ArtScene(SceneManager& sceneManager) :
-	Scene(sceneManager),
-	particlesToAdd(0),
-	currentAffectorType(0),
-	currentEmitterType(0)
+    Scene(sceneManager),
+    particlesToAdd(0),
+    currentAffectorType(0),
+    currentEmitterType(0)
 {
-	timer.start();
+    timer.start();
 }
 
 void ArtScene::update()
 {
-	auto isParticleSystemOpen = true;
+    auto isParticleSystemOpen = true;
 
-	ImGui::Begin("Particle System", &isParticleSystemOpen, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
-	
-	ImGui::SetWindowPos({ 0.f, 0.f });
+    ImGui::Begin("Particle System", &isParticleSystemOpen, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
 
-	addMenuBar();
+    ImGui::SetWindowPos({ 0.f, 0.f });
 
-	addParticleSystemTree();
+    addMenuBar();
 
-	ImGui::End();
+    addParticleSystemTree();
 
-	updateRemovals();
+    ImGui::End();
 
-	particleSystem.update(static_cast<float>(timer.getSeconds()));
+    updateRemovals();
 
-	timer.start();
+    particleSystem.update(static_cast<float>(timer.getSeconds()));
+
+    timer.start();
 }
 
 void ArtScene::draw()
 {
-	particleSystem.draw();
+    particleSystem.draw();
 }
 
 void ArtScene::addTexture()
 {
-	const auto textureFilepath = cinder::app::getOpenFilePath();
-	
-	try
-	{
-		particleSystem.addTexture(cinder::gl::Texture2d::create(cinder::loadImage(textureFilepath)), textureFilepath.string());
-	}
-	catch (...)
-	{
-		cinder::app::console() << "Unable to load texture" << std::endl;
-	}
+    const auto textureFilepath = cinder::app::getOpenFilePath();
+
+    try
+    {
+        particleSystem.addTexture(cinder::gl::Texture2d::create(cinder::loadImage(textureFilepath)), textureFilepath.string());
+    }
+    catch (...)
+    {
+        cinder::app::console() << "Unable to load texture" << std::endl;
+    }
 }
 
 void ArtScene::addMenuBar()
 {
-	if (ImGui::BeginMenuBar())
-	{
-		if (ImGui::BeginMenu("File"))
-		{
-			if (ImGui::MenuItem("Open", "Ctrl+O"))
-			{
-				particleSystem.load(cinder::app::getOpenFilePath().string());
-			}
-			if (ImGui::MenuItem("Save", "Ctrl+S"))
-			{
-				particleSystem.save(cinder::app::getSaveFilePath().string());
-			}
-			
-			ImGui::EndMenu();
-		}
+    if (ImGui::BeginMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("Open", "Ctrl+O"))
+            {
+                particleSystem.load(cinder::app::getOpenFilePath().string());
+            }
+            if (ImGui::MenuItem("Save", "Ctrl+S"))
+            {
+                particleSystem.save(cinder::app::getSaveFilePath().string());
+            }
 
-		ImGui::EndMenuBar();
-	}
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMenuBar();
+    }
 }
 
 void ArtScene::addParticleSystemTree()
 {
-	if (ImGui::TreeNode("Particle System"))
-	{
-		addPauseParticles();
-		addClearParticles();
-		addAffectorsNode();
-		addEmittersNode();
-		addTexturesNode();
+    if (ImGui::TreeNode("Particle System"))
+    {
+        addPauseParticles();
+        addClearParticles();
+        addAffectorsNode();
+        addEmittersNode();
+        addTexturesNode();
 
-		ImGui::TreePop();
-	}
+        ImGui::TreePop();
+    }
 }
 
 void ArtScene::addPauseParticles()
 {
-	ImGui::SameLine();
+    ImGui::SameLine();
 
-	if (particleSystem.isPaused())
-	{
-		if(ImGui::Button("Resume"))
-		{
-			particleSystem.setPauseStatus(false);
-		}
-	}
-	else
-	{
-		if (ImGui::Button("Pause"))
-		{
-			particleSystem.setPauseStatus(true);
-		}
-	}
+    if (particleSystem.isPaused())
+    {
+        if (ImGui::Button("Resume"))
+        {
+            particleSystem.setPauseStatus(false);
+        }
+    }
+    else
+    {
+        if (ImGui::Button("Pause"))
+        {
+            particleSystem.setPauseStatus(true);
+        }
+    }
 }
 
 void ArtScene::addClearParticles()
 {
-	ImGui::SameLine();
+    ImGui::SameLine();
 
-	if (ImGui::Button("Clear"))
-	{
-		particleSystem.clearParticles();
-	}
+    if (ImGui::Button("Clear"))
+    {
+        particleSystem.clearParticles();
+    }
 }
 
 void ArtScene::addAffectorsNode()
 {
-	auto isAffectorsOpen = ImGui::TreeNode("Affectors");
+    auto isAffectorsOpen = ImGui::TreeNode("Affectors");
 
-	ImGui::SameLine();
+    ImGui::SameLine();
 
-	if (ImGui::Button("Add##openAddAffector"))
-	{
-		ImGui::OpenPopup("Add Affector");
-	}
+    if (ImGui::Button("Add##openAddAffector"))
+    {
+        ImGui::OpenPopup("Add Affector");
+    }
 
-	ImGui::SameLine();
+    ImGui::SameLine();
 
-	if (ImGui::Button("Clear##clearAffector"))
-	{
-		particleSystem.clearAffectors();
-	}
+    if (ImGui::Button("Clear##clearAffector"))
+    {
+        particleSystem.clearAffectors();
+    }
 
-	auto isAddAffectorOpen = true;
+    auto isAddAffectorOpen = true;
 
-	if (ImGui::BeginPopupModal("Add Affector", &isAddAffectorOpen, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-		const char* affectorTypes[] = { "Life Time", "Linear Velocity", "Angular Velocity", "Color Gradient" };
+    if (ImGui::BeginPopupModal("Add Affector", &isAddAffectorOpen, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        const char* affectorTypes[] = { "Life Time", "Linear Velocity", "Angular Velocity", "Color Gradient" };
 
-		ImGui::Combo("Affector Types", &currentAffectorType, affectorTypes, 4);
+        ImGui::Combo("Affector Types", &currentAffectorType, affectorTypes, 4);
 
-		if (ImGui::Button("Add##addAffector"))
-		{
-			switch (currentAffectorType)
-			{
-			case 0:
-				particleSystem.addAffector(std::make_unique<LifeTimeAffector>());
-				break;
-			case 1:
-				particleSystem.addAffector(std::make_unique<LinearVelocityAffector>());
-				break;
-			case 2:
-				particleSystem.addAffector(std::make_unique<AngularVelocityAffector>());
-				break;
-			case 3:
-				particleSystem.addAffector(std::make_unique<ColorGradientAffector>());
-				break;
-			}
+        if (ImGui::Button("Add##addAffector"))
+        {
+            switch (currentAffectorType)
+            {
+            case 0:
+                particleSystem.addAffector(std::make_unique<LifeTimeAffector>());
+                break;
+            case 1:
+                particleSystem.addAffector(std::make_unique<LinearVelocityAffector>());
+                break;
+            case 2:
+                particleSystem.addAffector(std::make_unique<AngularVelocityAffector>());
+                break;
+            case 3:
+                particleSystem.addAffector(std::make_unique<ColorGradientAffector>());
+                break;
+            }
 
-			ImGui::CloseCurrentPopup();
-		}
+            ImGui::CloseCurrentPopup();
+        }
 
-		ImGui::EndPopup();
-	}
+        ImGui::EndPopup();
+    }
 
-	if (isAffectorsOpen)
-	{
-		std::size_t affectorID = 0;
+    if (isAffectorsOpen)
+    {
+        std::size_t affectorID = 0;
 
-		for (const auto& affector : particleSystem.getAffectors())
-		{
-			ImGui::Text(affector->getAffectorType()._to_string());
+        for (const auto& affector : particleSystem.getAffectors())
+        {
+            ImGui::Text(affector->getAffectorType()._to_string());
 
-			ImGui::SameLine();
+            ImGui::SameLine();
 
-			ImGui::PushID(++affectorID);
+            ImGui::PushID(++affectorID);
 
-			if (ImGui::Button("Remove##removeAffector"))
-			{
-				removalCallbacks.push_back([this, &affector]() { particleSystem.removeAffector(affector); });
-			}
+            if (ImGui::Button("Remove##removeAffector"))
+            {
+                removalCallbacks.push_back([this, &affector]() { particleSystem.removeAffector(affector); });
+            }
 
-			ImGui::PopID();
-		}
+            ImGui::PopID();
+        }
 
-		ImGui::TreePop();
-	}
+        ImGui::TreePop();
+    }
 }
 
 void ArtScene::addEmittersNode()
 {
-	auto isEmittersOpen = ImGui::TreeNode("Emitters");
+    auto isEmittersOpen = ImGui::TreeNode("Emitters");
 
-	ImGui::SameLine();
+    ImGui::SameLine();
 
-	if (ImGui::Button("Add##openAddEmitter"))
-	{
-		ImGui::OpenPopup("Add Emitter");
-	}
+    if (ImGui::Button("Add##openAddEmitter"))
+    {
+        ImGui::OpenPopup("Add Emitter");
+    }
 
-	ImGui::SameLine();
+    ImGui::SameLine();
 
-	if (ImGui::Button("Clear##clearEmitter"))
-	{
-		particleSystem.clearEmitters();
-	}
+    if (ImGui::Button("Clear##clearEmitter"))
+    {
+        particleSystem.clearEmitters();
+    }
 
-	auto isAddEmitterOpen = true;
+    auto isAddEmitterOpen = true;
 
-	if (ImGui::BeginPopupModal("Add Emitter", &isAddEmitterOpen, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-		const char* emitterTypes[] = { "Default" };
+    if (ImGui::BeginPopupModal("Add Emitter", &isAddEmitterOpen, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        const char* emitterTypes[] = { "Default" };
 
-		ImGui::Combo("Emitter Types", &currentEmitterType, emitterTypes, 1);
+        ImGui::Combo("Emitter Types", &currentEmitterType, emitterTypes, 1);
 
-		if (ImGui::Button("Add##addEmitter"))
-		{
-			switch (currentEmitterType)
-			{
-			case 0:
-				particleSystem.addEmitter(std::make_unique<DefaultEmitter>());
-				break;
-			}
+        if (ImGui::Button("Add##addEmitter"))
+        {
+            switch (currentEmitterType)
+            {
+            case 0:
+                particleSystem.addEmitter(std::make_unique<DefaultEmitter>());
+                break;
+            }
 
-			ImGui::CloseCurrentPopup();
-		}
+            ImGui::CloseCurrentPopup();
+        }
 
-		ImGui::EndPopup();
-	}
+        ImGui::EndPopup();
+    }
 
-	if (isEmittersOpen)
-	{
-		std::size_t emitterID = 0;
+    if (isEmittersOpen)
+    {
+        std::size_t emitterID = 0;
 
-		for (auto& emitter : particleSystem.getEmitters())
-		{
-			ImGui::PushID(++emitterID);
+        for (auto& emitter : particleSystem.getEmitters())
+        {
+            ImGui::PushID(++emitterID);
 
-			auto isEmitterOpen = ImGui::TreeNode(emitter->getEmitterType()._to_string());
+            auto isEmitterOpen = ImGui::TreeNode(emitter->getEmitterType()._to_string());
 
-			ImGui::SameLine();
+            ImGui::SameLine();
 
-			if (ImGui::Button("Remove##removeEmitter"))
-			{
-				removalCallbacks.push_back([this, &emitter]() { particleSystem.removeEmitter(emitter); });
-			}
+            if (ImGui::Button("Remove##removeEmitter"))
+            {
+                removalCallbacks.push_back([this, &emitter]() { particleSystem.removeEmitter(emitter); });
+            }
 
-			if (isEmitterOpen)
-			{
-				ImGui::PushItemWidth(40.f);
+            if (isEmitterOpen)
+            {
+                ImGui::PushItemWidth(40.f);
 
-				ImGui::InputFloat("Emission Rate", &emitter->emissionRate);
+                ImGui::InputFloat("Emission Rate", &emitter->emissionRate);
 
-				ImGui::PopItemWidth();
+                ImGui::PopItemWidth();
 
-				ImGui::PushItemWidth(70.f);
+                ImGui::PushItemWidth(70.f);
 
-				ImGui::InputInt("Texture Index", &emitter->textureIndex);
+                ImGui::InputInt("Texture Index", &emitter->textureIndex);
 
-				ImGui::SameLine();
+                ImGui::SameLine();
 
-				ImGui::InputInt("Texture Index Variance", &emitter->textureIndexVariance);
+                ImGui::InputInt("Texture Index Variance", &emitter->textureIndexVariance);
 
-				ImGui::PopItemWidth();
+                ImGui::PopItemWidth();
 
-				ImGui::PushItemWidth(60.f);
+                ImGui::PushItemWidth(60.f);
 
-				ImGui::InputFloat("Life Time", &emitter->totalLifeTime);
+                ImGui::InputFloat("Life Time", &emitter->totalLifeTime);
 
-				ImGui::SameLine();
+                ImGui::SameLine();
 
-				ImGui::InputFloat("Life Time Variance", &emitter->lifeTimeVariance);
+                ImGui::InputFloat("Life Time Variance", &emitter->lifeTimeVariance);
 
-				ImGui::PopItemWidth();
+                ImGui::PopItemWidth();
 
-				ImGui::PushItemWidth(95.f);
+                ImGui::PushItemWidth(95.f);
 
-				ImGui::InputFloat2("Position(x, y)", &emitter->position[0]);
+                ImGui::InputFloat2("Position(x, y)", &emitter->position[0]);
 
-				ImGui::SameLine();
+                ImGui::SameLine();
 
-				ImGui::InputFloat2("Position Variance(x, y)", &emitter->positionVariance[0]);
+                ImGui::InputFloat2("Position Variance(x, y)", &emitter->positionVariance[0]);
 
-				ImGui::PopItemWidth();
+                ImGui::PopItemWidth();
 
-				ImGui::PushItemWidth(55.f);
+                ImGui::PushItemWidth(55.f);
 
-				ImGui::InputFloat2("Scale(width, height)", &emitter->scale[0]);
+                ImGui::InputFloat2("Scale(width, height)", &emitter->scale[0]);
 
-				ImGui::SameLine();
+                ImGui::SameLine();
 
-				ImGui::InputFloat2("Scale Variance(width, height)", &emitter->scaleVariance[0]);
+                ImGui::InputFloat2("Scale Variance(width, height)", &emitter->scaleVariance[0]);
 
-				ImGui::PopItemWidth();
+                ImGui::PopItemWidth();
 
-				ImGui::PushItemWidth(40.f);
+                ImGui::PushItemWidth(40.f);
 
-				ImGui::InputFloat("Angle", &emitter->angle);
+                ImGui::InputFloat("Angle", &emitter->angle);
 
-				ImGui::SameLine();
+                ImGui::SameLine();
 
-				ImGui::InputFloat("Angle Variance", &emitter->angleVariance);
+                ImGui::InputFloat("Angle Variance", &emitter->angleVariance);
 
-				ImGui::PopItemWidth();
+                ImGui::PopItemWidth();
 
-				ImGui::PushItemWidth(95.f);
+                ImGui::PushItemWidth(95.f);
 
-				ImGui::InputFloat2("Linear Velocity(x, y)", &emitter->linearVelocity[0]);
+                ImGui::InputFloat2("Linear Velocity(x, y)", &emitter->linearVelocity[0]);
 
-				ImGui::SameLine();
+                ImGui::SameLine();
 
-				ImGui::InputFloat2("Linear Velocity Variance(x, y)", &emitter->linearVelocityVariance[0]);
+                ImGui::InputFloat2("Linear Velocity Variance(x, y)", &emitter->linearVelocityVariance[0]);
 
-				ImGui::PopItemWidth();
+                ImGui::PopItemWidth();
 
-				ImGui::PushItemWidth(45.f);
+                ImGui::PushItemWidth(45.f);
 
-				ImGui::InputFloat("Angular Velocity", &emitter->angularVelocity);
+                ImGui::InputFloat("Angular Velocity", &emitter->angularVelocity);
 
-				ImGui::SameLine();
+                ImGui::SameLine();
 
-				ImGui::InputFloat("Angular Velocity Variance", &emitter->angularVelocityVariance);
+                ImGui::InputFloat("Angular Velocity Variance", &emitter->angularVelocityVariance);
 
-				ImGui::PopItemWidth();
+                ImGui::PopItemWidth();
 
-				ImGui::PushItemWidth(150.f);
+                ImGui::PushItemWidth(150.f);
 
-				ImGui::ColorEdit3("Start Color", &emitter->startColor[0]);
+                ImGui::ColorEdit3("Start Color", &emitter->startColor[0]);
 
-				ImGui::SameLine();
+                ImGui::SameLine();
 
-				ImGui::ColorEdit3("Start Color Variance", &emitter->startColorVariance[0]);
+                ImGui::ColorEdit3("Start Color Variance", &emitter->startColorVariance[0]);
 
-				ImGui::ColorEdit3("End Color", &emitter->endColor[0]);
+                ImGui::ColorEdit3("End Color", &emitter->endColor[0]);
 
-				ImGui::SameLine();
+                ImGui::SameLine();
 
-				ImGui::ColorEdit3("End Color Variance", &emitter->endColorVariance[0]);
+                ImGui::ColorEdit3("End Color Variance", &emitter->endColorVariance[0]);
 
-				ImGui::PopItemWidth();
+                ImGui::PopItemWidth();
 
-				ImGui::TreePop();
-			}
+                ImGui::TreePop();
+            }
 
-			ImGui::PopID();
-		}
+            ImGui::PopID();
+        }
 
-		ImGui::TreePop();
-	}
+        ImGui::TreePop();
+    }
 }
 
 void ArtScene::addTexturesNode()
 {
-	auto isTexturesOpen = ImGui::TreeNode("Textures");
+    auto isTexturesOpen = ImGui::TreeNode("Textures");
 
-	ImGui::SameLine();
+    ImGui::SameLine();
 
-	if (ImGui::Button("Add##addTexture"))
-	{
-		addTexture();
-	}
+    if (ImGui::Button("Add##addTexture"))
+    {
+        addTexture();
+    }
 
-	ImGui::SameLine();
+    ImGui::SameLine();
 
-	if (ImGui::Button("Clear##clearTextures"))
-	{
-		particleSystem.clearTextures();
-	}
+    if (ImGui::Button("Clear##clearTextures"))
+    {
+        particleSystem.clearTextures();
+    }
 
-	if (isTexturesOpen)
-	{
-		std::size_t textureIndex = 0;
+    if (isTexturesOpen)
+    {
+        std::size_t textureIndex = 0;
 
-		for (const auto& texture : particleSystem.getTextures())
-		{
-			ImGui::Image(texture, texture->getSize());
+        for (const auto& texture : particleSystem.getTextures())
+        {
+            ImGui::Image(texture, texture->getSize());
 
-			ImGui::SameLine();
+            ImGui::SameLine();
 
-			ImGui::PushID(textureIndex);
-			
-			if (ImGui::Button("Remove##removeTexture"))
-			{
-				removalCallbacks.push_back([this, textureIndex]() { particleSystem.removeTexture(textureIndex); });
-			}
+            ImGui::PushID(textureIndex);
 
-			ImGui::PopID();
+            if (ImGui::Button("Remove##removeTexture"))
+            {
+                removalCallbacks.push_back([this, textureIndex]() { particleSystem.removeTexture(textureIndex); });
+            }
 
-			++textureIndex;
-		}
+            ImGui::PopID();
 
-		ImGui::TreePop();
-	}
+            ++textureIndex;
+        }
+
+        ImGui::TreePop();
+    }
 }
 
 void ArtScene::updateRemovals()
 {
-	for (const auto& removal : removalCallbacks)
-	{
-		removal();
-	}
+    for (const auto& removal : removalCallbacks)
+    {
+        removal();
+    }
 
-	removalCallbacks.clear();
+    removalCallbacks.clear();
 }

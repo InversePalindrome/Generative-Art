@@ -13,12 +13,12 @@ InversePalindrome.com
 class DefaultEmitter : public Emitter
 {
 public:
-	DefaultEmitter();
+    DefaultEmitter();
 
-	virtual void update(ParticleSystem& particleSystem, float deltaTime) override;
-	
+    virtual void update(ParticleSystem& particleSystem, float deltaTime) override;
+
 private:
-	float emissionDifference;
+    float emissionDifference;
 
-	std::size_t numberOfEmittedParticles(float deltaTime);
+    std::size_t numberOfEmittedParticles(float deltaTime);
 };

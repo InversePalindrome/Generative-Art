@@ -20,13 +20,13 @@ InversePalindrome.com
 class TextureManager
 {
 public:
-	static TextureManager& getInstance();
+    static TextureManager& getInstance();
 
-	void load(const std::string& filename);
+    void load(const std::string& filename);
 
-	cinder::gl::Texture2dRef& operator[](Texture texture);
-	const cinder::gl::Texture2dRef& operator[](Texture texture) const;
+    cinder::gl::Texture2dRef& operator[](Texture texture);
+    const cinder::gl::Texture2dRef& operator[](Texture texture) const;
 
 private:
-	std::unordered_map<Texture, cinder::gl::Texture2dRef, EnumHash<Texture>> textures;
+    std::unordered_map<Texture, cinder::gl::Texture2dRef, EnumHash<Texture>> textures;
 };

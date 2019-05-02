@@ -9,11 +9,11 @@ InversePalindrome.com
 
 
 ColorGradientAffector::ColorGradientAffector() :
-	Affector(AffectorType::ColorGradient)
+    Affector(AffectorType::ColorGradient)
 {
 }
 
 void ColorGradientAffector::update(Particle& particle, float deltaTime)
 {
-	particle.setColor(particle.getColor() + (particle.getEndColor() - particle.getColor()) * (deltaTime / particle.getTotalLifeTime()));
+    particle.setColor(particle.getColor() + (particle.getEndColor() - particle.getColor()) * (deltaTime / particle.getTotalLifeTime()));
 }

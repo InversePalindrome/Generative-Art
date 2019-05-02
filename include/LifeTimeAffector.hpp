@@ -13,7 +13,7 @@ InversePalindrome.com
 class LifeTimeAffector : public Affector
 {
 public:
-	LifeTimeAffector();
+    LifeTimeAffector();
 
-	virtual void update(Particle& particle, float deltaTime) override;
+    virtual void update(Particle& particle, float deltaTime) override;
 };

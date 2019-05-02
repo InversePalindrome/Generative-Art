@@ -14,33 +14,33 @@ InversePalindrome.com
 
 TextureManager& TextureManager::getInstance()
 {
-	static TextureManager textureManager;
+    static TextureManager textureManager;
 
-	return textureManager;
+    return textureManager;
 }
 
 void TextureManager::load(const std::string& filename)
 {
-	pugi::xml_document doc;
+    pugi::xml_document doc;
 
-	if (doc.load_file(cinder::app::getAssetPath(filename).c_str()))
-	{
-		if (const auto texturesNode = doc.child("Textures"))
-		{
-			for (const auto textureNode : texturesNode.children())
-			{
-				textures.emplace(Texture::_from_string(textureNode.name()), cinder::gl::Texture::create(cinder::loadImage(cinder::app::loadAsset(textureNode.text().as_string()))));
-			}
-		}
-	}
+    if (doc.load_file(cinder::app::getAssetPath(filename).c_str()))
+    {
+        if (const auto texturesNode = doc.child("Textures"))
+        {
+            for (const auto textureNode : texturesNode.children())
+            {
+                textures.emplace(Texture::_from_string(textureNode.name()), cinder::gl::Texture::create(cinder::loadImage(cinder::app::loadAsset(textureNode.text().as_string()))));
+            }
+        }
+    }
 }
 
 cinder::gl::Texture2dRef& TextureManager::operator[](Texture texture)
 {
-	return textures.at(texture);
+    return textures.at(texture);
 }
 
 const cinder::gl::Texture2dRef& TextureManager::operator[](Texture texture) const
 {
-	return textures.at(texture);
+    return textures.at(texture);
 }

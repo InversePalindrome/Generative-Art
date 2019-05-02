@@ -16,24 +16,24 @@ InversePalindrome.com
 
 
 SplashScene::SplashScene(SceneManager& sceneManager) :
-	Scene(sceneManager),
-	splashTime(3.0),
-	splashScreen(TextureManager::getInstance()[Texture::SplashScreen])
+    Scene(sceneManager),
+    splashTime(3.0),
+    splashScreen(TextureManager::getInstance()[Texture::SplashScreen])
 {
-	timer.start();
+    timer.start();
 }
 
 void SplashScene::update()
 {
-	if (timer.getSeconds() >= splashTime)
-	{
-		sceneManager.popScene();
-		sceneManager.pushScene<ArtScene>();
-	}
+    if (timer.getSeconds() >= splashTime)
+    {
+        sceneManager.popScene();
+        sceneManager.pushScene<ArtScene>();
+    }
 }
 
 void SplashScene::draw()
 {
-	cinder::gl::clear(cinder::ColorA::white());
-	cinder::gl::draw(splashScreen, {(cinder::app::getWindowWidth() - splashScreen->getWidth()) / 2.f, (cinder::app::getWindowHeight() - splashScreen->getHeight()) / 2.f});
+    cinder::gl::clear(cinder::ColorA::white());
+    cinder::gl::draw(splashScreen, { (cinder::app::getWindowWidth() - splashScreen->getWidth()) / 2.f, (cinder::app::getWindowHeight() - splashScreen->getHeight()) / 2.f });
 }

@@ -17,21 +17,21 @@ InversePalindrome.com
 class SceneManager
 {
 public:
-	void update();
-	void draw();
+    void update();
+    void draw();
 
-	template<typename T, typename... Ts>
-	void pushScene(Ts... params);
+    template<typename T, typename... Ts>
+    void pushScene(Ts... params);
 
-	void popScene();
+    void popScene();
 
 private:
-	std::vector<std::unique_ptr<Scene>> scenes;
-	std::vector<std::function<void()>> sceneTransitions;
+    std::vector<std::unique_ptr<Scene>> scenes;
+    std::vector<std::function<void()>> sceneTransitions;
 };
 
 template<typename T, typename ...Ts>
 void SceneManager::pushScene(Ts... params)
 {
-	sceneTransitions.push_back([this, params...]() {scenes.push_back(std::make_unique<T>(*this, params...)); });
+    sceneTransitions.push_back([this, params...]() {scenes.push_back(std::make_unique<T>(*this, params...)); });
 }

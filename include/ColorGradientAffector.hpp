@@ -17,7 +17,7 @@ InversePalindrome.com
 class ColorGradientAffector : public Affector
 {
 public:
-	ColorGradientAffector();
+    ColorGradientAffector();
 
-	virtual void update(Particle& particle, float deltaTime) override;
+    virtual void update(Particle& particle, float deltaTime) override;
 };

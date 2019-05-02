@@ -9,11 +9,11 @@ InversePalindrome.com
 
 
 LinearVelocityAffector::LinearVelocityAffector() :
-	Affector(AffectorType::LinearVelocity)
+    Affector(AffectorType::LinearVelocity)
 {
 }
 
 void LinearVelocityAffector::update(Particle& particle, float deltaTime)
 {
-	particle.setPosition(particle.getPosition() + particle.getLinearVelocity() * deltaTime);
+    particle.setPosition(particle.getPosition() + particle.getLinearVelocity() * deltaTime);
 }

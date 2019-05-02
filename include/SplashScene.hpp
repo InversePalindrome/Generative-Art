@@ -16,14 +16,14 @@ InversePalindrome.com
 class SplashScene : public Scene
 {
 public:
-	explicit SplashScene(SceneManager& sceneManager);
+    explicit SplashScene(SceneManager& sceneManager);
 
-	virtual void update() override;
-	virtual void draw() override;
+    virtual void update() override;
+    virtual void draw() override;
 
 private:
-	cinder::Timer timer;
-	const double splashTime;
+    cinder::Timer timer;
+    const double splashTime;
 
-	cinder::gl::Texture2dRef& splashScreen;
+    cinder::gl::Texture2dRef& splashScreen;
 };

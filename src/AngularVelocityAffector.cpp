@@ -9,11 +9,11 @@ InversePalindrome.com
 
 
 AngularVelocityAffector::AngularVelocityAffector() :
-	Affector(AffectorType::AngularVelocity)
+    Affector(AffectorType::AngularVelocity)
 {
 }
 
 void AngularVelocityAffector::update(Particle& particle, float deltaTime)
 {
-	particle.setAngle(particle.getAngle() + particle.getAngularVelocity() * deltaTime);
+    particle.setAngle(particle.getAngle() + particle.getAngularVelocity() * deltaTime);
 }

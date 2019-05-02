@@ -10,6 +10,6 @@ InversePalindrome.com
 
 
 Scene::Scene(SceneManager& sceneManager) :
-	sceneManager(sceneManager)
+    sceneManager(sceneManager)
 {
 }

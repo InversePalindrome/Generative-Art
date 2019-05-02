@@ -19,14 +19,14 @@ InversePalindrome.com
 class Application : public cinder::app::App
 {
 public:
-	static void initSettings(cinder::app::App::Settings* settings);
+    static void initSettings(cinder::app::App::Settings* settings);
 
-	virtual void setup() override;
-	virtual void update() override;
-	virtual void draw() override;
+    virtual void setup() override;
+    virtual void update() override;
+    virtual void draw() override;
 
 private:
-	SceneManager sceneManager;
+    SceneManager sceneManager;
 };
 
 CINDER_APP(Application, cinder::app::RendererGl, Application::initSettings)

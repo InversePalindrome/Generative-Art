@@ -19,14 +19,14 @@ BETTER_ENUM(AffectorType, int, LifeTime, LinearVelocity, AngularVelocity, ColorG
 class Affector
 {
 public:
-	explicit Affector(AffectorType affectorType);
+    explicit Affector(AffectorType affectorType);
 
-	virtual void load(const pugi::xml_node& affectorNode);
-	virtual void save(pugi::xml_node& affectorNode) const;
-	virtual void update(Particle& particle, float deltaTime)=0;
+    virtual void load(const pugi::xml_node& affectorNode);
+    virtual void save(pugi::xml_node& affectorNode) const;
+    virtual void update(Particle& particle, float deltaTime) = 0;
 
-	AffectorType getAffectorType() const;
-	
+    AffectorType getAffectorType() const;
+
 private:
-	AffectorType affectorType;
+    AffectorType affectorType;
 };
